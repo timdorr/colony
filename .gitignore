@@ -1,5 +1,5 @@
-var/cache/*
+var/cache/*php
 app/Config.php
-app/controllers/*
-app/plugins/*
-app/views/*
+app/controllers/*php
+app/plugins/*php
+app/views/*/
