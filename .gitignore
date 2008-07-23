@@ -1,0 +1,5 @@
+var/cache/*
+app/Config.php
+app/controllers/*
+app/plugins/*
+app/views/*
