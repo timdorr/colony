@@ -52,6 +52,12 @@ require_once 'ASO/Display.php';
 class ASO_Dispatch 
 {
     /**
+     * Application config
+     * @var array
+     */
+    public $config = array();
+    
+    /**
      * Base URL
      * @var string
      */
@@ -84,10 +90,11 @@ class ASO_Dispatch
     public function __construct()
     {  
         global $CONFIG;
+        $this->config =& $CONFIG;
 
         $this->_baseUrl = preg_replace( '#index\.php.*#i', '', $_SERVER['PHP_SELF'] );
         
-        ASO_Display::factory( $CONFIG['display_backend'] );
+        ASO_Display::factory( $this->config['display_backend'] );
     }
 
     /**
@@ -145,15 +152,13 @@ class ASO_Dispatch
      */
     protected function _dispatch()
     {
-        global $CONFIG;
-    
         // Check that controller class exists
         if( !file_exists( 'app/controllers/' . $this->_getAction() . '.php' ) )
             throw new ASO_Dispatch_Exception( "Controller not found" );
             
         require_once 'controllers/' . $this->_getAction() . '.php';
         $action = ucfirst( $this->_getAction() ) . '_Controller';
-        $controller = new $action( $CONFIG );
+        $controller = new $action( $this->config );
         
         $this->_defaultMethod = $controller->defaultMethod;
         $method = $this->_getMethod();
