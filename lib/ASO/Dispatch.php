@@ -162,7 +162,7 @@ class ASO_Dispatch
         if( !method_exists( $controller, $method ) )
             throw new ASO_Dispatch_Exception( 'Method not found: ' . $action . '::' . $method );
             
-        $controller->{$method}();
+        $controller->{$method}( $this->_getExtra() );
         
         $controller->completeDispatch();
 
@@ -171,7 +171,7 @@ class ASO_Dispatch
     }
     
     /**
-     * Returns the action from the HTTP request
+     * Returns the action from the HTTP request URI
      * 
      * @return string The action requested
      */
@@ -190,7 +190,7 @@ class ASO_Dispatch
     }
     
     /**
-     * Returns the method from the HTTP request
+     * Returns the method from the HTTP request URI
      * 
      * @return string The method requested
      */
@@ -206,6 +206,25 @@ class ASO_Dispatch
             return $this->_defaultMethod;
         else
             return $tokens[1];
+    }
+    
+    /**
+     * Returns any extra data from the HTTP request URI
+     * 
+     * @return string The extra data requested
+     */
+    protected function _getExtra()
+    {
+        $method_string = str_replace( 'index.php', '', $_SERVER['REQUEST_URI'] );
+        $baseurl = preg_quote( $this->_baseUrl );
+        $method_string = preg_replace( "#^$baseurl#", '', $method_string );
+        $method_string = preg_replace( '#\?.*#', '', $method_string );
+        $tokens = explode( '/', $method_string );
+
+        if( empty( $tokens[2] ) )
+            return null;
+        else
+            return $tokens[2];
     }
 }
 
