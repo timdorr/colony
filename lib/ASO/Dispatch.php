@@ -71,16 +71,28 @@ class ASO_Dispatch
     protected $_throwExceptions = false;
     
     /**
-     * Default action if not specified in HTTP request
+     * Default action if not specified in HTTP request URI
      * @var string
      */
     protected $_defaultAction = 'index';
-    
+
     /**
-     * Default method if not specified in HTTP request
+     * Action from HTTP request URI
      * @var string
      */
-    protected $_defaultMethod = 'main';
+    public $action = '';
+    
+    /**
+     * Method from HTTP request URI
+     * @var string
+     */
+    public $method = '';
+    
+    /**
+     * Extra data from HTTP request URI
+     * @var mixed
+     */
+    public $extra = null;
     
     /**
      * Constructor
@@ -152,84 +164,108 @@ class ASO_Dispatch
      */
     protected function _dispatch()
     {
+        $this->_splitURI();
+    
         // Check that controller class exists
-        if( !file_exists( 'app/controllers/' . $this->_getAction() . '.php' ) )
-            throw new ASO_Dispatch_Exception( "Controller not found" );
-            
-        require_once 'controllers/' . $this->_getAction() . '.php';
-        $action = ucfirst( $this->_getAction() ) . '_Controller';
+        if( !file_exists( 'app/controllers/' . $this->action . '.php' ) )
+            throw new ASO_Dispatch_Exception( "Controller ($this->action) not found" );
+
+        // Instantiate the action controller
+        require_once 'controllers/' . $this->action . '.php';
+        $action = ucfirst( $this->action ) . '_Controller';
         $controller = new $action( $this->config );
-        
-        $this->_defaultMethod = $controller->defaultMethod;
-        $method = $this->_getMethod();
+
+        // If a method wasn't defined in the URI, grab the default from the controller
+        if( $this->method == '' )
+            $this->method = $controller->defaultMethod;
 
         // Check that method call exists
-        if( !method_exists( $controller, $method ) )
+        if( !method_exists( $controller, $this->method ) )
             throw new ASO_Dispatch_Exception( 'Method not found: ' . $action . '::' . $method );
-            
-        $controller->{$method}( $this->_getExtra() );
+
+        $controller->{$this->method}( $this->extra );
         
         $controller->completeDispatch();
 
-        ASO_Display::display( $this->_getAction() . '/' . $method, get_object_vars( $controller ) );
+        ASO_Display::display( $this->action . '/' . $this->method, get_object_vars( $controller ) );
+    }
+    
+    /**
+     * Splits the HTTP request URI into action, method, extra data. Applies routing.
+     * 
+     * @return void
+     */
+    protected function _splitURI()
+    {
+        // Clean the URI of excess data
+        $method_string = str_replace( 'index.php', '', $_SERVER['REQUEST_URI'] );
+        $baseurl = preg_quote( $this->_baseUrl );
+        $method_string = preg_replace( "#^$baseurl#", '', $method_string );
+        $method_string = preg_replace( '#\?.*#', '', $method_string );
         
-    }
-    
-    /**
-     * Returns the action from the HTTP request URI
-     * 
-     * @return string The action requested
-     */
-    protected function _getAction()
-    {
-        $method_string = str_replace( 'index.php', '', $_SERVER['REQUEST_URI'] );
-        $baseurl = preg_quote( $this->_baseUrl );
-        $method_string = preg_replace( "#^$baseurl#", '', $method_string );
-        $method_string = preg_replace( '#\?.*#', '', $method_string );
+        // Apply routing
+        if( isset( $this->config['routing'] ) )
+        {
+            foreach( $this->config['routing'] as $pattern => $mapping )
+            {
+                // Check if the URI matches this routing pattern
+                if( preg_match( $pattern, $method_string, $matches ) )
+                {
+                    if( isset( $mapping['action'] ) )
+                    {
+                        // If the mapping value is numeric, assign that part of the pattern
+                        // Otherwise, it's just the value of the mapping
+                        if( is_numeric( $mapping['action'] ) )
+                            $this->action = $matches[$mapping['action']];
+                        else
+                            $this->action = $mapping['action'];
+                    
+                    }
+                    
+                    if( isset( $mapping['method'] ) )
+                    {
+                        if( is_numeric( $mapping['method'] ) )
+                            $this->method = $matches[$mapping['method']];
+                        else
+                            $this->method = $mapping['method'];
+                    
+                    }
+                    
+                    if( isset( $mapping['extra'] ) )
+                    {
+                        if( is_numeric( $mapping['extra'] ) )
+                            $this->extra = $matches[$mapping['extra']];
+                        else
+                            $this->extra = $mapping['extra'];
+                    
+                    }
+                    
+                    // Don't do any more URI splitting if we've found a match
+                    return;
+                }
+            }
+            
+        }
+        
         $tokens = explode( '/', $method_string );
-
+        
+        // Get the action
         if( empty( $tokens[0] ) )
-            return $this->_defaultAction;
+            $this->action = $this->_defaultAction;
         else
-            return $tokens[0];
-    }
-    
-    /**
-     * Returns the method from the HTTP request URI
-     * 
-     * @return string The method requested
-     */
-    protected function _getMethod()
-    {
-        $method_string = str_replace( 'index.php', '', $_SERVER['REQUEST_URI'] );
-        $baseurl = preg_quote( $this->_baseUrl );
-        $method_string = preg_replace( "#^$baseurl#", '', $method_string );
-        $method_string = preg_replace( '#\?.*#', '', $method_string );
-        $tokens = explode( '/', $method_string );
-
+            $this->action = $tokens[0];
+        
+        // Get the method
         if( empty( $tokens[1] ) )
-            return $this->_defaultMethod;
+            $this->method = '';
         else
-            return $tokens[1];
-    }
-    
-    /**
-     * Returns any extra data from the HTTP request URI
-     * 
-     * @return string The extra data requested
-     */
-    protected function _getExtra()
-    {
-        $method_string = str_replace( 'index.php', '', $_SERVER['REQUEST_URI'] );
-        $baseurl = preg_quote( $this->_baseUrl );
-        $method_string = preg_replace( "#^$baseurl#", '', $method_string );
-        $method_string = preg_replace( '#\?.*#', '', $method_string );
-        $tokens = explode( '/', $method_string );
-
+            $this->method = $tokens[1];
+        
+        // Get the extra data
         if( empty( $tokens[2] ) )
-            return null;
+            $this->extra = null;
         else
-            return $tokens[2];
+            $this->extra = $tokens[2];
     }
 }
 
