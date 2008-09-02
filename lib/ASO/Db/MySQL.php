@@ -306,6 +306,32 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
     {
         return $this->queryFetch( "SELECT * FROM $table WHERE $where" );
     }
+    
+    /**
+     * Returns the string representation of the object
+     *
+     * @return string
+     */
+    public function __toString() {
+    	$out = "";
+    	$out .= "<pre>";
+    	$out .= "Database Object\n";
+    	$out .= "{\n";
+    	$out .= "\t[connected] => ".( $this->_connection == null ? "false" : "true" )."\n";
+    	
+    	$out .= "\t[last_query] => ".$this->query."\n";
+    	$out .= "\t[querycount] => ".$this->querycount."\n";
+    	$out .= "\t[querytimes] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querytimes, true ) )."\n";
+    	$out .= "\t[querylist] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querylist, true ) )."\n";
+
+    	
+    	
+
+    	$out .= "}\n";
+    	$out .= "</pre>";
+    	return $out;
+    }
+
 }
 
 class ASO_Db_MySQL_Exception extends ASO_Db_Abstract_Exception

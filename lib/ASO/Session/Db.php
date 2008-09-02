@@ -105,6 +105,7 @@ class ASO_Session_Db
             if( $this->_db->num_rows() == 1 )
             {
                 $this->_data = unserialize( $result['data'] );
+                $this->_time = $result['time'];
                 
                 setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
             }
@@ -123,6 +124,7 @@ class ASO_Session_Db
     public function newSession()
     {
         $this->_id = sha1( uniqid( microtime() ) );
+		$this->_time = time();
         $this->_data = array();
 
         setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
@@ -164,6 +166,38 @@ class ASO_Session_Db
 
         return $this->_data;
     }
+
+    /**
+     * Gets the stored time from the session
+     *
+     * @return int
+     */    
+    public function getTime()
+    {
+        $this->_loadSession();
+
+        return $this->_time;
+    }
+
+    /**
+     * Returns the string representation of the object
+     *
+     * @return string
+     */
+    public function __toString() {
+        //$this->_loadSession();
+    	$out = "";
+    	$out .= "<pre>";
+    	$out .= "Session Object\n";
+    	$out .= "{\n";
+    	$out .= "\t[session_id] => ".$this->_id."\n";
+    	$out .= "\t[time] => ".date( DATE_RFC822, $this->_time )."\n";
+    	$out .= "\t[data] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->_data, true ) )."\n";
+    	$out .= "}\n";
+    	$out .= "</pre>";
+    	return $out;
+    }
+    
 }
 
 class ASO_Session_Db_Exception extends ASO_Session_Abstract_Exception
