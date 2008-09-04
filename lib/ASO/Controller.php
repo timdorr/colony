@@ -115,7 +115,7 @@ class ASO_Controller
                                                        'session_domain' => $config['session_domain'],
                                                        'session_path' => $config['session_path'] ) );
         $sess =& ASO_Registry('sess');
-        $sess = $this->input = $this->_session->getData();
+        $sess = $this->sess = $this->_session->getData();
 
         $this->_loadPlugins();
         
