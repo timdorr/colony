@@ -3,3 +3,5 @@ app/Config.php
 app/controllers/*php
 app/plugins/*php
 app/views/*/
+.DS_Store
+

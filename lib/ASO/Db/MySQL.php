@@ -313,8 +313,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
      * @return string
      */
     public function __toString() {
-    	$out = "";
-    	$out .= "<pre>";
+    	$out = "<pre>";
     	$out .= "Database Object\n";
     	$out .= "{\n";
     	$out .= "\t[connected] => ".( $this->_connection == null ? "false" : "true" )."\n";
@@ -323,9 +322,6 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
     	$out .= "\t[querycount] => ".$this->querycount."\n";
     	$out .= "\t[querytimes] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querytimes, true ) )."\n";
     	$out .= "\t[querylist] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querylist, true ) )."\n";
-
-    	
-    	
 
     	$out .= "}\n";
     	$out .= "</pre>";

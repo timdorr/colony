@@ -36,6 +36,12 @@ set_error_handler(create_function('$x, $y', 'throw new Exception($y, $x);'), E_A
 require_once 'ASO/Exception.php';
 
 /**
+ * @see ASO_Registry
+ */
+require_once 'ASO/Registry.php';
+
+
+/**
  * @see ASO_Display
  */
 require_once 'ASO/Display.php';
