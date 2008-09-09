@@ -118,6 +118,29 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 	}
 	
 	/**
+	 * Querys the db and gets all rows.
+	 * @param string $query_string The query string to run
+	 * @param integer $no_debug Tells the function if it should record the query in the debug variables.
+	 * @return array An array of all rows of the query
+	 */
+    public function queryFetchAll( $query_string = "", $no_debug = 0 )
+    {
+        $this->query( $query_string, $no_debug );
+        
+		if( mysql_num_rows( $this->_queryid ) > 0 )
+		{
+			$res = array();
+			while( $row = $this->fetch_assoc( $this->_queryid ) )
+				$res[] = $row;
+			return $res;
+		}
+		else
+		{
+			return array();
+		}
+    }
+	
+	/**
 	 * Inserts an array of data into a table
 	 * @param string $table The table to insert into
 	 * @param array $data The data to insert with keys as field names
