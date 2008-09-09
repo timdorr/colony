@@ -40,6 +40,10 @@ require_once 'ASO/Exception.php';
  */
 require_once 'ASO/Registry.php';
 
+/**
+ * @see ASO_Input
+ */
+require_once 'ASO/Input.php';
 
 /**
  * @see ASO_Display
