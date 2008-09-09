@@ -42,8 +42,14 @@ require_once 'ASO/Exception.php';
  */
 class ASO_Input 
 {
+    /**
+     * Cached input data
+     * @var array
+     */
+    private static $input = null;
+
 	/**
-	 * Cleans input.
+	 * Cleans input. Caches locally.
 	 *
 	 * Takes all available $_GET, $_POST, and $_COOKIE input and reduces the
 	 * chances of attacks and problems.
@@ -52,48 +58,55 @@ class ASO_Input
 	 *
 	 * @return array The cleaned input
 	 */
-	public static function filterInput()
+	public static function &filterInput()
 	{
 		global $HTTP_CLIENT_IP, $REQUEST_METHOD, $REMOTE_ADDR, $HTTP_PROXY_USER, $HTTP_X_FORWARDED_FOR;
-
-		$super = array( &$_GET, &$_POST, &$_COOKIE );
 		
-		$return = array();
-		foreach( $super as $duper )
+		
+		if( self::$input == null )
 		{
-			if( is_array( $duper ) )
-			{
-				foreach( $duper as $k => $v )
-				{
-					if( is_array( $duper[$k] ) )
-					{
-						foreach( $duper[$k] as $k2 => $v2 )
-						{	
-							if( is_array( $duper[$k][$k2] ) )
-							{
-								foreach( $duper[$k][$k2] as $k3 => $v3 )
-									$return[ self::cleanKey($k) ][ self::cleanKey($k2) ][ self::cleanKey( $k3 ) ] = self::cleanValue( $v3 );
-							}
-							else
-								$return[ self::cleanKey($k) ][ self::cleanKey( $k2 ) ] = self::cleanValue( $v2 );
-						}
-					}
-					else
-					
-					    $return[ self::cleanKey($k) ] = self::cleanValue( $v );
-				}
-			}
+            $super = array( &$_GET, &$_POST, &$_COOKIE );
+            
+            $return = array();
+            foreach( $super as $duper )
+            {
+                if( is_array( $duper ) )
+                {
+                    foreach( $duper as $k => $v )
+                    {
+                        if( is_array( $duper[$k] ) )
+                        {
+                            foreach( $duper[$k] as $k2 => $v2 )
+                            {	
+                                if( is_array( $duper[$k][$k2] ) )
+                                {
+                                    foreach( $duper[$k][$k2] as $k3 => $v3 )
+                                        $return[ self::cleanKey($k) ][ self::cleanKey($k2) ][ self::cleanKey( $k3 ) ] = self::cleanValue( $v3 );
+                                }
+                                else
+                                    $return[ self::cleanKey($k) ][ self::cleanKey( $k2 ) ] = self::cleanValue( $v2 );
+                            }
+                        }
+                        else
+                        
+                            $return[ self::cleanKey($k) ] = self::cleanValue( $v );
+                    }
+                }
+            }
+            
+            // Sort out the accessing IP
+            $return['IP_ADDRESS'] = $_SERVER['REMOTE_ADDR'];
+            $return['IP_ADDRESS'] = preg_replace( "/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/", 
+                                                  "\\1.\\2.\\3.\\4", 
+                                                  $return['IP_ADDRESS'] );
+            
+            $return['REQUEST_METHOD'] = strtolower( $REQUEST_METHOD );
+            
+            self::$input = $return;
         }
+            
 		
-		// Sort out the accessing IP
-		$return['IP_ADDRESS'] = $_SERVER['REMOTE_ADDR'];
-		$return['IP_ADDRESS'] = preg_replace( "/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/", 
-		                                      "\\1.\\2.\\3.\\4", 
-		                                      $return['IP_ADDRESS'] );
-		
-		$return['REQUEST_METHOD'] = strtolower( $REQUEST_METHOD );
-		
-		return $return;
+		return self::$input;
 	}
 
 	/**
