@@ -2,6 +2,7 @@ var/cache/*php
 app/Config.php
 app/controllers/*php
 app/plugins/*php
+app/*
 app/views/*/
 .DS_Store
 

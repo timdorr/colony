@@ -155,9 +155,16 @@ class ASO_Dispatch
             }
             else
             {
-                print '<pre>';
-                print $e;
-                print '</pre>';
+                if( file_exists( 'app/views/error.tpl' ) )
+                {
+                    ASO_Display::display( 'error', array( 'error' => $e ) );
+                }
+                else
+                {
+                    print '<pre>';
+                    print $e;
+                    print '</pre>';
+                }
             }
         }
     }
