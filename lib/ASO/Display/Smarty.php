@@ -76,11 +76,20 @@ class ASO_Display_Smarty
     public function runDisplay( $view, $data )
     {
         $this->smarty->assign( $data );
+        $this->smarty->assign( 'input', ASO_Input::filterInput() );
         
         // GZip compression
-        ob_start ( 'ob_gzhandler' );
-
-        $this->smarty->display( $view . '.tpl' );
+        //ob_start( 'ob_gzhandler' );
+        
+        if( file_exists( 'app/views/global.tpl' ) && $view != 'error' )
+        {        
+            $this->smarty->assign( 'templatefile', $view . '.tpl' );
+            $this->smarty->display( 'global.tpl' );
+        }
+        else
+        {
+            $this->smarty->display( $view . '.tpl' );
+        }
     }
 
 }
