@@ -77,6 +77,7 @@ class ASO_Display_Smarty
     {
         $this->smarty->assign( $data );
         $this->smarty->assign( 'input', ASO_Input::filterInput() );
+        $this->smarty->assign( 'sess', ASO_Registry('sess') );
         
         // GZip compression
         //ob_start( 'ob_gzhandler' );
