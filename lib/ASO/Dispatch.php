@@ -67,7 +67,7 @@ class ASO_Dispatch
      * Base URL
      * @var string
      */
-    protected $_baseUrl = null;
+    protected $_baseURL = null;
     
     /**
      * Determines if exceptions should escape the ASO_Core object or be released to 
@@ -110,7 +110,7 @@ class ASO_Dispatch
         global $CONFIG;
         $this->config =& $CONFIG;
 
-        $this->_baseUrl = preg_replace( '#index\.php.*#i', '', $_SERVER['PHP_SELF'] );
+        $this->_baseURL = preg_replace( '#index\.php.*#i', '', $_SERVER['PHP_SELF'] );
         
         ASO_Display::factory( $this->config['display_backend'] );
     }
@@ -186,7 +186,7 @@ class ASO_Dispatch
         // Instantiate the action controller
         require_once 'controllers/' . $this->action . '.php';
         $action = ucfirst( $this->action ) . '_Controller';
-        $controller = new $action( $this->config );
+        $controller = new $action( array_merge( $this->config, array( 'baseURL' => $this->_baseURL ) ) );
 
         // If a method wasn't defined in the URI, grab the default from the controller
         if( $this->method == '' )
@@ -196,10 +196,11 @@ class ASO_Dispatch
         if( !method_exists( $controller, $this->method ) )
             throw new ASO_Dispatch_Exception( 'Method not found: ' . $action . '::' . $method );
 
+        // Run the method
         $controller->{$this->method}( $this->extra );
-        
         $controller->completeDispatch();
 
+        // Display back to the browser
         ASO_Display::display( $this->action . '/' . $this->method, get_object_vars( $controller ) );
     }
     
@@ -212,7 +213,7 @@ class ASO_Dispatch
     {
         // Clean the URI of excess data
         $method_string = str_replace( 'index.php', '', $_SERVER['REQUEST_URI'] );
-        $baseurl = preg_quote( $this->_baseUrl );
+        $baseurl = preg_quote( $this->_baseURL );
         $method_string = preg_replace( "#^$baseurl#", '', $method_string );
         $method_string = preg_replace( '#\?.*#', '', $method_string );
         
