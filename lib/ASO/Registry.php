@@ -26,74 +26,75 @@
  * @copyright  Copyright (c) A Small Orange Software (http://www.asmallorange.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-
+ 
 /**
- * @see ASO_Display
- */
-require_once 'ASO/Display.php';
-
-/** Smarty */
-require_once 'Smarty/Smarty.class.php';
-
-/**
- * Display backend for the Smarty templating engine
+ * Registry class for accessing variables globally.
  *
  * @category   ASOworx
  * @package    ASO
  * @copyright  Copyright (c) A Small Orange Software (http://www.asmallorange.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Display_Smarty
+class ASO_Registry
 {
     /**
-     * Smarty instance
-     * @var Smarty
+     * Singleton instance of registry
+     * @var ASO_Registry
      */
-    private $smarty = null;
-
-    /** 
-     * Constructor
-     *
-     * Instantiates Smarty for later awesomeness
-     */
-    public function __construct()
-    {    
-        $this->smarty = new Smarty();
-        
-        $this->smarty->template_dir = './app/views/';
-        $this->smarty->compile_dir = './var/cache/';
-        $this->smarty->config_dir = './var/cache/';
-        $this->smarty->cache_dir = './var/cache/';
-    }
+    private static $instance;
 
     /**
-     * Display the data through Smarty
-     *
-     * @param array $view The template to use
-     * @param array $data The data to be used in the template
+     * Stored variables in registry
+     * @var array
+     */
+    private $vars = array();
+    
+    /**
+     * Stores a variable in the registry
+     * 
+     * @param string $key Key of the variable
+     * @param mixed $var Reference to the variable
      * @return void
      */
-    public function runDisplay( $view, $data )
+    public function setVar( $key, $var )
     {
-        $this->smarty->assign( $data );
-        $this->smarty->assign( 'input', ASO_Input::filterInput() );
-        $this->smarty->assign( 'sess', ASO_Registry('sess') );
-        
-        // GZip compression
-        //ob_start( 'ob_gzhandler' );
-        
-        if( file_exists( 'app/views/global.tpl' ) && $view != 'error' )
-        {        
-            $this->smarty->assign( 'templatefile', $view . '.tpl' );
-            $this->smarty->display( 'global.tpl' );
-        }
-        else
-        {
-            $this->smarty->display( $view . '.tpl' );
-        }
+        $this->vars[$key] &= $var;
     }
+    
+    /**
+     * Gets a variable from the registry
+     * 
+     * @param string $key Key of the variable
+     * @return mixed
+     */
+    public function &getVar( $key )
+    {
+        return $this->vars[$key];
+    }
+    
+    /**
+     * Gets the singleton instance of the registry
+     * 
+     * @return ASO_Registry
+     */   
+    public static function &getInstance() 
+    {
+        if( !isset( self::$instance ) )
+            self::$instance = new ASO_Registry;
 
+        return self::$instance;
+    }
 }
+ 
+/**
+ * Public function for convienience. Wraps around ASO_Registry::getVar()
+ * 
+ * @param string $key Key of the variable
+ * @return mixed
+ */
+function &ASO_Registry( $key )
+{
+    $reg =& ASO_Registry::getInstance();
 
-class ASO_Display_Smarty_Exception extends ASO_Display_Exception
-{}
+    return $reg->getVar( $key );
+}

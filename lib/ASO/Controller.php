@@ -82,6 +82,13 @@ class ASO_Controller
     protected $_session = null;
     
     /**
+     * The base URL from the dispatcher
+     * @var string
+     */
+    protected $baseURL = '';
+
+    
+    /**
      * The default method to run if none is specified
      * @var string
      */
@@ -102,18 +109,24 @@ class ASO_Controller
             throw new Zend_Controller_Exception('Controller configuraion must be in an array');
     
         $this->_setEnvironment();
-        $this->_loadPlugins();
         
-        $this->input = ASO_Input::filterInput();
+        $this->baseURL = $config['baseURL'];
         
-        $this->db = ASO_Db::factory( $config['db_type'], $config );
+        $input =& ASO_Registry('input');
+        $input = $this->input = ASO_Input::filterInput();
+        
+        $db =& ASO_Registry('db');
+        $db = $this->db = ASO_Db::factory( $config['db_type'], $config );
         
         $this->_session = ASO_Session::factory( 'Db', 
                                                 array( 'db' => &$this->db,
                                                        'session_timeout' => $config['session_timeout'],
                                                        'session_domain' => $config['session_domain'],
                                                        'session_path' => $config['session_path'] ) );
-        $this->sess = $this->_session->getData();
+        $sess =& ASO_Registry('sess');
+        $sess = $this->sess = $this->_session->getData();
+
+        $this->_loadPlugins();
         
         // Run the setup function, if defined
         $this->_setup();
@@ -127,6 +140,21 @@ class ASO_Controller
     public function completeDispatch()
     {
         $this->_session->saveSession( $this->sess );
+    }
+    
+    
+    /**
+     * Redirects to another location.
+     * 
+     * @param string $location The location to redirect to
+     * @return void
+     */
+    protected function redirect( $location ) 
+    {
+        $this->_session->saveSession( $this->sess );
+
+		header( "Location: {$this->baseURL}$location" );
+		exit();
     }
 
     /**
