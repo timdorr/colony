@@ -185,7 +185,19 @@ class ASO_Dispatch
     
         // Check that controller class exists
         if( !file_exists( 'app/controllers/' . $this->action . '.php' ) )
-            throw new ASO_Dispatch_Exception( "Controller ($this->action) not found" );
+        {
+            if( $this->throwExceptions() || !file_exists( 'app/views/404.tpl' ) )
+            {
+                header( 'HTTP/1.1 404 Not Found' );
+                throw new ASO_Dispatch_Exception( "Controller ($this->action) not found" );
+            }
+            else
+            {
+                header( 'HTTP/1.1 404 Not Found' );
+                ASO_Display::display( '404' );
+                return false;
+            }
+        }
 
         // Instantiate the action controller
         require_once 'controllers/' . $this->action . '.php';

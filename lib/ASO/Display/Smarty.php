@@ -82,7 +82,7 @@ class ASO_Display_Smarty
         // GZip compression
         //ob_start( 'ob_gzhandler' );
         
-        if( file_exists( 'app/views/global.tpl' ) && $view != 'error' )
+        if( file_exists( 'app/views/global.tpl' ) && $view != 'error' && $view != '404' )
         {        
             $this->smarty->assign( 'templatefile', $view . '.tpl' );
             $this->smarty->display( 'global.tpl' );
