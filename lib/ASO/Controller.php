@@ -113,7 +113,7 @@ class ASO_Controller
         $this->baseURL = $config['baseURL'];
         
         $input =& ASO_Registry('input');
-        $input = $this->input = ASO_Input::filterInput();
+        $input = $this->input =& ASO_Input::filterInput();
         
         $db =& ASO_Registry('db');
         $db = $this->db = ASO_Db::factory( $config['db_type'], $config );
@@ -124,7 +124,8 @@ class ASO_Controller
                                                        'session_domain' => $config['session_domain'],
                                                        'session_path' => $config['session_path'] ) );
         $sess =& ASO_Registry('sess');
-        $sess = $this->sess = $this->_session->getData();
+        $sess = $this->_session->getData();
+        $this->sess =& $sess;
 
         $this->_loadPlugins();
         
