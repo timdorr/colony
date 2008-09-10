@@ -337,7 +337,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 	 * @return array The values that make up the enumeration
 	 */
 	function enum_values( $table, $field ) {
-		$row = $this->query_fetch( "SHOW COLUMNS FROM `{$table}` LIKE '{$field}'" );
+		$row = $this->queryFetch( "SHOW COLUMNS FROM `{$table}` LIKE '{$field}'" );
 		preg_match_all( "/'(.*?)'/" , $row["Type"], $enum_array );
 		$enum_fields = $enum_array[1];
 		return $enum_fields;
@@ -350,7 +350,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 	 * @return array The unique values that make up the field
 	 */
 	function unique_values( $table, $field ) {
-		$res = $this->query_all( "SELECT DISTINCT {$field} FROM {$table} WHERE {$field} IS NOT NULL ORDER BY {$field}" );
+		$res = $this->queryFetchAll( "SELECT DISTINCT {$field} FROM {$table} WHERE {$field} IS NOT NULL ORDER BY {$field}" );
 		$return = array();
 		foreach ( $res as $r ) {
 			$return[] = $r[ $field ];
