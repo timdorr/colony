@@ -330,6 +330,34 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
         return $this->queryFetch( "SELECT * FROM $table WHERE $where" );
     }
     
+	/**
+	 * Grab the enumeration/set values from a table for a specific field.
+	 * @param string $table The name of the table to pull from
+	 * @param string $field The field to pull from
+	 * @return array The values that make up the enumeration
+	 */
+	function enum_values( $table, $field ) {
+		$row = $this->query_fetch( "SHOW COLUMNS FROM `{$table}` LIKE '{$field}'" );
+		preg_match_all( "/'(.*?)'/" , $row["Type"], $enum_array );
+		$enum_fields = $enum_array[1];
+		return $enum_fields;
+	}
+	
+	/**
+	 * Grab the unique values from a table for a specific field.
+	 * @param string $table The name of the table to pull from
+	 * @param string $field The field to pull from
+	 * @return array The unique values that make up the field
+	 */
+	function unique_values( $table, $field ) {
+		$res = $this->query_all( "SELECT DISTINCT {$field} FROM {$table} WHERE {$field} IS NOT NULL ORDER BY {$field}" );
+		$return = array();
+		foreach ( $res as $r ) {
+			$return[] = $r[ $field ];
+		}
+		return $return;
+	}
+    
     /**
      * Returns the string representation of the object
      *
