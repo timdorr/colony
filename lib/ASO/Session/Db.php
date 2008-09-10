@@ -90,7 +90,7 @@ class ASO_Session_Db
     private function _loadSession()
     {
         // Check if we've got an existing session stored
-        $input = ASO_Input::filterInput();
+        $input =& ASO_Input::filterInput();
         if ( !array_key_exists( 'session', $input ) )
         {
             $this->newSession();
