@@ -314,7 +314,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 	
 		$count = array_pop( $this->queryFetch( "SELECT COUNT(*) FROM $table $where" ) );
 	
-		return array( 'data'  => $this->get_all( $table, $limit, ( $page - 1 ) * $limit ),
+		return array( 'data'  => $this->getAll( $table, $limit, ( $page - 1 ) * $limit ),
 					  'count' => $count,
 					  'pages' => round( $count / $limit ) + 1 );
 	}
