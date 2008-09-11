@@ -161,7 +161,9 @@ class ASO_Dispatch
             {
                 if( file_exists( 'app/views/error.tpl' ) )
                 {
-                    ASO_Display::display( 'error', array( 'error' => $e ) );
+                    $error_message = preg_replace( '/mysql_connect\([^)]+?\)/im', 'mysql_connect()', $e );
+                    ASO_Display::display( 'error', array( 'error' => $error_message,
+                                                          'exception' => $e ) );
                 }
                 else
                 {
