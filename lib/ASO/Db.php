@@ -26,6 +26,11 @@
  * @copyright  Copyright (c) A Small Orange Software (http://www.asmallorange.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
+ 
+/**
+ * @see ASO_Exception
+ */
+require_once 'ASO/Exception.php';
 
 /**
  * SQL Database abstraction layer.
