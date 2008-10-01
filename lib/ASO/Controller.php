@@ -186,7 +186,8 @@ class ASO_Controller
             {
                 require_once "plugins/$file";
                 $className = str_replace( '.php', '', $file );
-                call_user_func( $className.'::init' );
+                if ( method_exists( $className, "init" ) )
+	                call_user_func( $className.'::init' );
             }
         }
     }
