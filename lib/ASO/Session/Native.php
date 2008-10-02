@@ -30,7 +30,17 @@
 /**
  * @see ASO_Session_Abstract
  */
-require_once 'ASO/Sesssion/Abstract.php';
+require_once 'ASO/Session/Abstract.php';
+
+/**
+ * @see ASO_Db_Abstract
+ */
+require_once 'ASO/Db/Abstract.php';
+
+/**
+ * @see ASO_Input
+ */
+require_once 'ASO/Input.php';
 
 /**
  * Session backend using the built-in PHP session handlers
@@ -42,6 +52,152 @@ require_once 'ASO/Sesssion/Abstract.php';
  */
 class ASO_Session_Native
 {
+
+    /**
+     * Database object
+     * @var ASO_Db_Abstract
+     */
+    private $_db = null;
+
+    /**
+     * Constructor for the class. Just sets some values for other functions.
+     *
+     * @param array $config The configuration to use for connection
+     */
+    public function __construct( &$config = array() )
+    {
+        // Verify that configuration is in an array.
+        if( !is_array( $config ) )
+            throw new ASO_Session_Native_Exception('Configuration must be in an array');
+
+        // Verify that a db object is passed
+        if( !isset( $config['db'] ) )
+            throw new ASO_Session_Native_Exception('Configuration is missing db');
+        if( !($config['db'] instanceof ASO_Db_Abstract) )
+            throw new ASO_Session_Native_Exception('Configuration is not ASO_Db_Abstract');
+    
+        $this->_db =& $config['db'];
+        
+        $this->timeout = $config['session_timeout'];
+        $this->domain = $config['session_domain'];
+        $this->path = $config['session_path'];
+    }
+    
+    /**
+     * Loads the session from the database
+     *
+     * @return void
+     */
+    private function _loadSession()
+    {
+
+        // Check if we've got an existing session stored
+        $input =& ASO_Input::filterInput();
+        if ( !array_key_exists( 'session', $input ) )
+        {
+            $this->newSession();
+        }
+        else
+        {
+        
+			session_start();
+
+            $this->_id = $input['session'];
+
+            if ( $_SESSION['session_id'] == $this->_id )
+            {
+                $this->_data = $_SESSION['data'];
+                $this->_time = $_SESSION['time'];
+                
+                setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
+            }
+            else
+            {
+                $this->newSession();
+            }
+        }
+    }
+
+    /**
+     * Creates a new empty session
+     *
+     * @return void
+     */
+    public function newSession()
+    {
+        $this->_id = sha1( uniqid( microtime() ) );
+		$this->_time = time();
+        $this->_data = array();
+
+        setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
+        
+		session_start();
+
+		$_SESSION['session_id'] = $this->_id;
+		$_SESSION['data'] = array();
+		$_SESSION['time'] = time();
+    }
+
+    /**
+     * Saves the session into the database
+     *
+     * @param array $data The data to be stored into the session
+     * @return void
+     */
+    public function saveSession( &$data )
+    {
+    
+        $this->_data = $data;
+        
+		session_start();
+
+		$_SESSION['session_id'] = $this->_id;
+		$_SESSION['data'] = $data;
+		$_SESSION['time'] = time();
+    }
+    
+    /**
+     * Gets the stored data from the session
+     *
+     * @return array
+     */
+    public function getData()
+    {
+        $this->_loadSession();
+
+        return $this->_data;
+    }
+
+    /**
+     * Gets the stored time from the session
+     *
+     * @return int
+     */    
+    public function getTime()
+    {
+        $this->_loadSession();
+
+        return $this->_time;
+    }
+
+    /**
+     * Returns the string representation of the object
+     *
+     * @return string
+     */
+    public function __toString() {
+        //$this->_loadSession();
+    	$out = "";
+    	$out .= "<pre>";
+    	$out .= "Session Object\n";
+    	$out .= "{\n";
+    	$out .= "\t[session_id] => ".$this->_id."\n";
+    	$out .= "\t[time] => ".date( DATE_RFC822, $this->_time )."\n";
+    	$out .= "\t[data] => ".print_r( $this->_data, true )."\n";
+    	$out .= "}\n";
+    	$out .= "</pre>";
+    	return $out;
+    }
 
 }
 

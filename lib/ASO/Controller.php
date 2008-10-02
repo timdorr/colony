@@ -118,7 +118,7 @@ class ASO_Controller
         $db =& ASO_Registry('db');
         $db = $this->db = ASO_Db::factory( $config['db_type'], $config );
         
-        $this->_session = ASO_Session::factory( 'Db', 
+        $this->_session = ASO_Session::factory( $config['session_type'],
                                                 array( 'db' => &$this->db,
                                                        'session_timeout' => $config['session_timeout'],
                                                        'session_domain' => $config['session_domain'],
