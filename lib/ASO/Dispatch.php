@@ -217,6 +217,12 @@ class ASO_Dispatch
         // Run the method
         $controller->{$this->method}( $this->extra );
         $controller->completeDispatch();
+        
+        // Save the local vars to the controller
+        $controller->action = $this->action;
+        $controller->method = $this->method;
+        $controller->extra = $this->extra;
+        $controller->_baseURL = $this->_baseURL;
 
         // Display back to the browser
         ASO_Display::display( $this->action . '/' . $this->method, get_object_vars( $controller ) );
