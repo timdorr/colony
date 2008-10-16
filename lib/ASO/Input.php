@@ -61,12 +61,11 @@ class ASO_Input
 	public static function &filterInput()
 	{
 		global $HTTP_CLIENT_IP, $REQUEST_METHOD, $REMOTE_ADDR, $HTTP_PROXY_USER, $HTTP_X_FORWARDED_FOR;
-		
-		
+
 		if( self::$input == null )
 		{
             $super = array( &$_GET, &$_POST, &$_COOKIE );
-            
+
             $return = array();
             foreach( $super as $duper )
             {
@@ -88,24 +87,22 @@ class ASO_Input
                             }
                         }
                         else
-                        
                             $return[ self::cleanKey($k) ] = self::cleanValue( $v );
                     }
                 }
             }
-            
+
             // Sort out the accessing IP
             $return['IP_ADDRESS'] = $_SERVER['REMOTE_ADDR'];
             $return['IP_ADDRESS'] = preg_replace( "/^([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})\.([0-9]{1,3})/", 
                                                   "\\1.\\2.\\3.\\4", 
                                                   $return['IP_ADDRESS'] );
-            
+
             $return['REQUEST_METHOD'] = strtolower( $REQUEST_METHOD );
-            
+
             self::$input = $return;
         }
-            
-		
+
 		return self::$input;
 	}
 
@@ -128,7 +125,7 @@ class ASO_Input
     	
     	return $key;
     }
- 
+
 	/**
 	 * Cleans a value
 	 *
