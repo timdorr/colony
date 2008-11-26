@@ -152,7 +152,7 @@ class ASO_Session_Db
                             $this->_id );
 
         // Clear out old sessions
-		$this->_db->query( "DELETE FROM session WHERE time < " . ( time() - $this->config['session_timeout'] ) );
+		$this->_db->query( "DELETE FROM session WHERE time < " . ( time() - $this->timeout ) );
     }
     
     /**
