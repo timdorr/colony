@@ -43,6 +43,11 @@ require_once 'ASO/Db.php';
 require_once 'ASO/Session.php';
 
 /**
+ * @see ASO_Error
+ */
+require_once 'ASO/Error.php';
+
+/**
  * @see ASO_Exception
  */
 require_once 'ASO/Exception.php';
@@ -76,17 +81,22 @@ class ASO_Controller
     protected $sess = array();
     
     /**
+     * Error storage
+     * @var ASO_Error
+     */
+    protected $error = null;
+    
+    /**
      * Session object
      * @var ASO_Session_Abstract 
      */
     protected $_session = null;
-    
+
     /**
      * The base URL from the dispatcher
      * @var string
      */
     protected $baseURL = '';
-
     
     /**
      * The default method to run if none is specified
@@ -107,17 +117,17 @@ class ASO_Controller
         // Verify that controller config is in an array.
         if( !is_array( $config ) )
             throw new Zend_Controller_Exception('Controller configuraion must be in an array');
-    
+
         $this->_setEnvironment();
-        
+
         $this->baseURL = $config['baseURL'];
-        
+
         $input =& ASO_Registry('input');
         $input = $this->input =& ASO_Input::filterInput();
-        
+
         $db =& ASO_Registry('db');
         $db = $this->db = ASO_Db::factory( $config['db_type'], $config );
-        
+
         $this->_session = ASO_Session::factory( $config['session_type'],
                                                 array( 'db' => &$this->db,
                                                        'session_timeout' => $config['session_timeout'],
@@ -127,8 +137,11 @@ class ASO_Controller
         $sess = $this->_session->getData();
         $this->sess =& $sess;
 
+        $error =& ASO_Registry('error');
+        $error = $this->error =& new ASO_Error( $this );
+
         $this->_loadPlugins();
-        
+
         // Run the setup function, if defined
         $this->_setup();
     }
@@ -140,6 +153,7 @@ class ASO_Controller
      */
     public function completeDispatch()
     {
+        $this->errors = $this->error->getAll();
         $this->_session->saveSession( $this->sess );
     }
     
@@ -150,7 +164,7 @@ class ASO_Controller
      * @param string $location The location to redirect to
      * @return void
      */
-    protected function redirect( $location ) 
+    public function redirect( $location ) 
     {
         $this->_session->saveSession( $this->sess );
 

@@ -32,6 +32,12 @@
  */
 require_once 'ASO/Display.php';
 
+/**
+ * @see ASO_Error
+ */
+require_once 'ASO/Error.php';
+
+
 /** Smarty */
 require_once 'Smarty/Smarty.class.php';
 
@@ -64,6 +70,8 @@ class ASO_Display_Smarty
         $this->smarty->compile_dir = './var/cache/';
         $this->smarty->config_dir = './var/cache/';
         $this->smarty->cache_dir = './var/cache/';
+        
+        $this->smarty->register_function( 'error', array( 'ASO_Error', 'formatError' ) );
     }
 
     /**
