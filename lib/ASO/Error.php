@@ -72,10 +72,13 @@ class ASO_Error
         
         // Load errors from the session object
         $sess =& ASO_Registry('sess');
-        self::$_errors = $sess['ASO_Error'];
-        
-        // Clear the session data for subsequent page loads
-        unset( $sess['ASO_Error'] );
+        if( isset( $sess['ASO_Error'] ) )
+        {
+            self::$_errors = $sess['ASO_Error'];
+            
+            // Clear the session data for subsequent page loads
+            unset( $sess['ASO_Error'] );
+        }
     }
 
     /**
