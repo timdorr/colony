@@ -153,6 +153,8 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 		
 		foreach( $data as $key => $value )
 		{
+            $value = mysql_escape_string( $value );
+
 			$columns .= " `$key`,";
 			$values  .= " '$value',";
 		}
