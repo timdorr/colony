@@ -173,9 +173,10 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 	 */
 	public function update( $table = "", $data = array(), $id_field, $id )
 	{   
-      $setters = '';
+        $setters = '';
 		foreach( $data as $key => $value )
 		{
+            $value = mysql_escape_string( $value );
 			$setters .= " `$key`='$value',";
 		}
 		
