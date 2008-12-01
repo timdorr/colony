@@ -61,7 +61,13 @@ require_once 'ASO/Exception.php';
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 class ASO_Controller
-{  
+{
+    /**
+     * Application config
+     * @var array
+     */
+    protected $config = array();
+
     /**
      * Processed input from ASO_Input::filter_input()
      * @var array
@@ -121,6 +127,7 @@ class ASO_Controller
         $this->_setEnvironment();
 
         $this->baseURL = $config['baseURL'];
+        $this->config = $config;
 
         $input =& ASO_Registry('input');
         $input = $this->input =& ASO_Input::filterInput();
