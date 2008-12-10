@@ -112,7 +112,8 @@ class ASO_Dispatch
     public function __construct()
     {  
         global $CONFIG;
-        $this->config =& $CONFIG;
+        $conf =& ASO_Registry('config');
+        $conf = $this->config =& $CONFIG;
 
         $this->_baseURL = preg_replace( '#index\.php.*#i', '', $_SERVER['PHP_SELF'] );
         
