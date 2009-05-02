@@ -214,7 +214,7 @@ class ASO_Dispatch
 
         // Check that method call exists
         if( !method_exists( $controller, $this->method ) )
-            throw new ASO_Dispatch_Exception( 'Method not found: ' . $action . '::' . $method );
+            throw new ASO_Dispatch_Exception( 'Method not found: ' . $action . '::' . $this->method );
 
         // Run the method
         $controller->{$this->method}( $this->extra );
