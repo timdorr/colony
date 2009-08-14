@@ -81,6 +81,20 @@ class ASO_Dispatch
     protected $_throwExceptions = false;
     
     /**
+     * Determines if exceptions should be logged.
+     * @var boolean
+     */
+    protected $_logExceptions = false;
+    protected $_exceptionLog = '/dev/null';
+    
+    /**
+     * Determines if exceptions should be emailed to an administrator.
+     * @var boolean
+     */
+    protected $_emailExceptions = false;
+    protected $_exceptionEmail = 'nobody';
+    
+    /**
      * Default action if not specified in HTTP request URI
      * @var string
      */
@@ -141,6 +155,50 @@ class ASO_Dispatch
     }
     
     /**
+     * Sets the logExceptions flag and retreives the current status.
+     *
+     * By default, exceptions are caught by the ASO_Dispatch class.
+     * Enabling this flag will additionally log them to a file defined
+     * by $CONFIG['exception_log'] (in app/Config.php).
+     *    
+     * @param boolean $flag
+     * @return void
+     */
+    public function logExceptions( $flag = null, $logFile = '/dev/null' )
+    {
+        if( $flag !== null )
+        {
+            $this->_logExceptions = (bool) $flag;
+            $this->_exceptionLog = $logFile;
+            return $this;
+        }
+        
+        return $this->_logExceptions;
+    }
+    
+    /**
+     * Sets the emailExceptions flag and retreives the current status.
+     *
+     * By default, exceptions are caught by the ASO_Dispatch class.
+     * Enabling this flag will additionally email them to an administrator
+     * (or whoever's email is passed in as the 2nd parameter). 
+     *    
+     * @param boolean $flag
+     * @return void
+     */
+    public function emailExceptions( $flag = null, $emailAddress = 'nobody' )
+    {
+        if( $flag !== null )
+        {
+            $this->_emailExceptions = (bool) $flag;
+            $this->_exceptionEmail = $emailAddress;
+            return $this;
+        }
+        
+        return $this->_emailExceptions;
+    }
+    
+    /**
      * Starts execution of the ASOworx framework.
      * 
      * @throws ASO_Exception  
@@ -154,6 +212,22 @@ class ASO_Dispatch
         }
         catch( Exception $e )
         {
+        	if( $this->logExceptions() )
+        	{
+        		$message = "----------\n" . "[{$this->config['app_name']}] Uncaught Exception:\n" . date('r') . "\n" . $e->getTraceAsString() . "\n" . print_r($_SERVER, true) . "\n\n";
+        	    error_log($message, 3, $this->_exceptionLog);
+        	}
+        	
+        	if( $this->emailExceptions() )
+        	{
+        		$to = $this->_exceptionEmail;
+                $from = $this->_exceptionEmail;
+                $subject = "[{$this->config['app_name']}] Uncaught Exception";
+        		$message = "An uncaught exception occurred; here are the details\n\n" . $e->getTraceAsString() . "\n\n" . print_r($_SERVER, true);
+        		
+        		mail($to, $subject, $message, "From: {$from}\r\rX-Mailer: PHP/" . phpversion());
+        	}
+        	
             if( $this->throwExceptions() )
             {
                 throw $e;

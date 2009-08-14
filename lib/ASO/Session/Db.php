@@ -102,7 +102,7 @@ class ASO_Session_Db
             // Grab the session data from the database
             $result = $this->_db->get( 'session', "session_id = '{$this->_id}'" );
 
-            if( $this->_db->num_rows() == 1 )
+            if( count($result) == 1 )
             {
                 $this->_data = unserialize( $result['data'] );
                 $this->_time = $result['time'];

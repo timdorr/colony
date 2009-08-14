@@ -72,7 +72,13 @@ class ASO_Db_PDO extends ASO_Db_Abstract
         $sql = "SELECT $sqlFields FROM $table WHERE $where";
 
         $statement = $this->_query($sql);
-        return $statement->fetchAll();
+        $results = $statement->fetchAll();
+        
+        if(!$results) {
+        	return array();
+        } else {
+        	return $results;
+        }
     }
         
     /** run an sql query and return a PDOStatement object */
@@ -98,16 +104,32 @@ class ASO_Db_PDO extends ASO_Db_Abstract
 
     public function queryFetch($query) {
         $statement = $this->_query($query);
-        return $statement->fetch();
+        $results = $statement->fetch();
+        
+        if(!$results) {
+        	return array();
+        } else {
+        	return $results;
+        }
     }
 
     public function queryFetchAll($query) {
         $statement = $this->_query($query);
-        return $statement->fetchAll();
+        $results = $statement->fetchAll();
+        
+        if(!$results) {
+        	return array();
+        } else {
+        	return $results;
+        }
     }
 
     public function get($table, $where) {
         return $this->select($table, $where, array());
+    }
+
+    public function num_rows($query_id = -1) {
+        throw new ASO_Db_PDO_Exception("num_rows is incompatible with PDO, use count() instead");
     }
 
     public function insert($table = "", $data = array()) {
@@ -120,7 +142,7 @@ class ASO_Db_PDO extends ASO_Db_Abstract
 		foreach( $data as $key => $value )
 		{
 		    if (!empty($columns)) {
-		        $columns .= ', ';
+		        $columns .= '`, `';
 		        $values .= ', ';
 		    }
 
@@ -129,13 +151,13 @@ class ASO_Db_PDO extends ASO_Db_Abstract
 			$params[":$key"] = $value;
 		}
 
-		$sql = "INSERT INTO $table( $columns ) VALUES ( $values )";
+		$sql = "INSERT INTO $table( `$columns` ) VALUES ( $values )";
 
 		$stmt = $this->prepare($sql);
 		$res = $stmt->execute($params);
 
 		if ($res == FALSE) {
-            $arr = $statement->errorInfo();
+            $arr = $stmt->errorInfo();
             throw new ASO_Db_PDO_Exception("PDO Error: " . $arr[2]);
         }
         
