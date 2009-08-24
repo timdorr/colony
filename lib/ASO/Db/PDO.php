@@ -125,7 +125,12 @@ class ASO_Db_PDO extends ASO_Db_Abstract
     }
 
     public function get($table, $where) {
-        return $this->select($table, $where, array());
+        $results = $this->select($table, $where, array());
+        if(count($results) < 1) {
+        	return array();
+        }
+        
+        return $results[0];
     }
 
     public function num_rows($query_id = -1) {
