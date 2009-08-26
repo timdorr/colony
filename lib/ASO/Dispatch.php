@@ -214,7 +214,7 @@ class ASO_Dispatch
         {
         	if( $this->logExceptions() )
         	{
-        		$message = "----------\n" . "[{$this->config['app_name']}] Uncaught Exception:\n" . date('r') . "\n" . $e->getTraceAsString() . "\n" . print_r($_SERVER, true) . "\n\n";
+        		$message = "----------\n" . "[{$this->config['app_name']}] Uncaught Exception:\n" . date('r') . "\n" . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n" . print_r($_SERVER, true) . "\n\n";
         	    error_log($message, 3, $this->_exceptionLog);
         	}
         	

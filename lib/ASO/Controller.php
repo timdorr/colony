@@ -122,7 +122,7 @@ class ASO_Controller
     {
         // Verify that controller config is in an array.
         if( !is_array( $config ) )
-            throw new Zend_Controller_Exception('Controller configuraion must be in an array');
+            throw new ASO_Controller_Exception('Controller configuraion must be in an array');
 
         $this->_setEnvironment();
 
