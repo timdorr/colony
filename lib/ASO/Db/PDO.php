@@ -194,7 +194,7 @@ class ASO_Db_PDO extends ASO_Db_Abstract
 		$res = $stmt->execute($params);
 
 		if ($res == FALSE) {
-            $arr = $statement->errorInfo();
+            $arr = $stmt->errorInfo();
             throw new ASO_Db_PDO_Exception("PDO Error: " . $arr[2]);
         }
         
