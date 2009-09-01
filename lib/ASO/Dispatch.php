@@ -223,7 +223,7 @@ class ASO_Dispatch
         		$to = $this->_exceptionEmail;
                 $from = $this->_exceptionEmail;
                 $subject = "[{$this->config['app_name']}] Uncaught Exception";
-        		$message = "An uncaught exception occurred; here are the details\n\n" . $e->getTraceAsString() . "\n\n" . print_r($_SERVER, true);
+        		$message = "An uncaught exception occurred; here are the details\n\n" . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n\n" . print_r($_SERVER, true);
         		
         		mail($to, $subject, $message, "From: {$from}\r\rX-Mailer: PHP/" . phpversion());
         	}
