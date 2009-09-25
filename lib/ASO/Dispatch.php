@@ -214,16 +214,16 @@ class ASO_Dispatch
         {
         	if( $this->logExceptions() )
         	{
-        		$message = "----------\n" . "[{$this->config['app_name']}] Uncaught Exception:\n" . date('r') . "\n" . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n" . print_r($_SERVER, true) . "\n\n";
-        	    error_log($message, 3, $this->_exceptionLog);
+			$message = "----------\n[{$this->config['app_name']}] Uncaught Exception:\n" . date('r') . "\n{$e->getMessage()} ({$e->getFile()}:{$e->getLine()})\n{$e->getTraceAsString()}\n\nPost: " . print_r($_POST, true) . "\n\nSession: " . print_r($this->controller->sess, true) . "\n\nServer: " . print_r($_SERVER, true) . "\n\n";
+			error_log($message, 3, $this->_exceptionLog);
         	}
         	
         	if( $this->emailExceptions() )
         	{
         		$to = $this->_exceptionEmail;
-                $from = $this->_exceptionEmail;
-                $subject = "[{$this->config['app_name']}] Uncaught Exception";
-        		$message = "An uncaught exception occurred; here are the details\n\n" . $e->getMessage() . "\n" . $e->getTraceAsString() . "\n\n" . print_r($_SERVER, true);
+			$from = $this->_exceptionEmail;
+			$subject = "[{$this->config['app_name']}] Uncaught Exception";
+        		$message = "An uncaught exception occurred; here are the details\n\n{$e->getMessage()} ({$e->getFile()}:{$e->getLine()})\n{$e->getTraceAsString()}\n\nPost: " . print_r($_POST, true) . "\n\nSession: " . print_r($this->controller->sess, true) . "\n\nServer: " . print_r($_SERVER, true) . "\n\n";
         		
         		mail($to, $subject, $message, "From: {$from}\r\rX-Mailer: PHP/" . phpversion());
         	}
@@ -280,7 +280,7 @@ class ASO_Dispatch
         // Instantiate the action controller
         require_once 'controllers/' . $this->action . '.php';
         $action = ucfirst( $this->action ) . '_Controller';
-        $controller = new $action( array_merge( $this->config, array( 'baseURL' => $this->_baseURL ) ) );
+        $this->controller = $controller = new $action( array_merge( $this->config, array( 'baseURL' => $this->_baseURL ) ) );
 
         // If a method wasn't defined in the URI, grab the default from the controller
         if( $this->method == '' )

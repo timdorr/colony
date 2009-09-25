@@ -84,7 +84,7 @@ class ASO_Controller
      * Current session data
      * @var array 
      */
-    protected $sess = array();
+    public $sess = array();
     
     /**
      * Error storage
