@@ -153,8 +153,13 @@ class ASO_Error
                     $errors[] = $err;
         }
         else
-            $errors = self::$_errors[$params['id']];
-
+        {
+            if( !empty( self::$_errors[$params['id']] ) )
+                $errors = self::$_errors[$params['id']];
+            else
+                $errors = array();
+        }
+        
         $smarty->assign( array( 'erroritems' => $errors ) );
 
         if( file_exists( 'app/views/erroritem.tpl' ) )
