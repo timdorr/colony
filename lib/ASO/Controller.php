@@ -84,7 +84,7 @@ class ASO_Controller
      * Current session data
      * @var array 
      */
-    protected $sess = array();
+    public $sess = array();
     
     /**
      * Error storage
@@ -122,7 +122,7 @@ class ASO_Controller
     {
         // Verify that controller config is in an array.
         if( !is_array( $config ) )
-            throw new Zend_Controller_Exception('Controller configuraion must be in an array');
+            throw new ASO_Controller_Exception('Controller configuraion must be in an array');
 
         $this->_setEnvironment();
 
@@ -220,6 +220,82 @@ class ASO_Controller
      * @return void
      */
     protected function _setup() { }
+    
+    /**
+     * Default callback for logging runtime exceptions.
+     * 
+     * Override this method in a subclass of ASO_Controller
+     * to log this error to someplace other than
+     * var/log/exceptions.log.
+     * 
+     * @param Exception $e The exception that was thrown at runtime
+     */ 
+    public function logException( $e )
+    {
+        $date = date( 'r' );
+        $postVars = print_r($_POST, true);
+        $sessionVars = print_r($this->sess, true);
+        $serverVars = print_r($_SERVER, true);
+        $message = <<<EXCEPTIONLOG
+----------
+[ASOworx] Uncaught Exception:
+{$date}
+{$e->getMessage()} ({$e->getFile()}:{$e->getLine()})
+{$e->getTraceAsString()}
+
+Post: {$postVars}
+
+Session: {$sessionVars}
+
+Server: {$serverVars}
+EXCEPTIONLOG;
+
+        $file = 'var/log/exceptions.log';
+        if( file_exists( $file ) && is_writable($file) )
+        {
+            error_log($message, 3, $file);
+        }
+    }
+    
+    /**
+     * Default callback for emailing runtime exceptions.
+     * 
+     * Override this method in a subclass of ASO_Controller
+     * to change the default behavior.
+     * 
+     * @param Exception $e The exception that was thrown at runtime
+     */ 
+    public function emailException( $e )
+    {
+        if( !isset($this->config['email_exceptions_address']) )
+        {
+            throw new ASO_Controller_Exception( "Exception emailing turned on but no address specified.  Please specify \$CONFIG['email_exceptions_address'] in app/Config.php" );
+        }
+        
+        $to = $from = $this->config['email_exceptions_address'];
+        $subject = "[ASOworx] Uncaught Exception";
+
+        $date = date( 'r' );
+        $postVars = print_r($_POST, true);
+        $sessionVars = print_r($this->sess, true);
+        $serverVars = print_r($_SERVER, true);
+        $message = <<<EMAILMESSAGE
+An uncaught exception occurred; here are the details:
+{$date}
+
+{$e->getMessage()} ({$e->getFile()}:{$e->getLine()})
+{$e->getTraceAsString()}
+
+Post: {$postVars}
+
+Session: {$sessionVars}
+
+Server: {$serverVars}
+EMAILMESSAGE;
+    
+        mail($to, $subject, $message, "From: {$from}\r\rX-Mailer: PHP/" . phpversion());
+    }
+    
 }
 
 class ASO_Controller_Exception extends ASO_Exception

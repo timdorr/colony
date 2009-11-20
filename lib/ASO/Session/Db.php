@@ -102,7 +102,7 @@ class ASO_Session_Db
             // Grab the session data from the database
             $result = $this->_db->get( 'session', "session_id = '{$this->_id}'" );
 
-            if( $this->_db->num_rows() == 1 )
+            if( count($result) > 0 )
             {
                 // Make sure it hasn't timed out
                 if( $result['time'] >= time() - $this->timeout )
