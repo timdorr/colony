@@ -185,6 +185,7 @@ class ASO_Dispatch
      */
     protected function _dispatch()
     {
+        $this->_loadRouting();
         $this->_splitURI();
     
         // Check that controller class exists
@@ -307,6 +308,30 @@ class ASO_Dispatch
         else
             $this->extra = $tokens[2];
     }
+
+    /**
+     * Loads routing from app/Routing.php  Note: routes were
+     * previously stored in app/Config.php but moved so that
+     * they could be versioned.
+     * 
+     * @return void
+     */
+    protected function _loadRouting()
+    {
+        $dir = opendir( './app/plugins/' );
+
+        if( file_exists( './app/Routing.php' ) )
+        {
+            include( './app/Routing.php' );
+
+            if( isset($ROUTING) )
+            {
+                global $CONFIG;
+                $CONFIG['routing'] = $ROUTING;
+            }
+        }
+    }
+    
 }
 
 class ASO_Dispatch_Exception extends ASO_Exception
