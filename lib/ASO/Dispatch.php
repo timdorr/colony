@@ -9,10 +9,10 @@
  * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
  * copies of the Software, and to permit persons to whom the Software is
  * furnished to do so, subject to the following conditions:
- * 
+ *
  * The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
- * 
+ *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
  * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -51,49 +51,47 @@ require_once 'ASO/Input.php';
 require_once 'ASO/Display.php';
 
 /**
- * Dispatcher to route HTTP requests into controllers and back out to a display 
- * adapter. 
+ * Dispatcher to route HTTP requests into controllers and back out to a display
+ * adapter.
  *
  * @category   ASOworx
  * @package    ASO
  * @copyright  Copyright (c) A Small Orange Software (http://www.asmallorange.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Dispatch 
+class ASO_Dispatch
 {
     /**
      * Application config
      * @var array
      */
     public $config = array();
-    
+
     /**
      * Base URL
      * @var string
      */
     protected $_baseURL = null;
-    
+
     /**
-     * Determines if exceptions should escape the ASO_Core object or be released to 
-     * the method caller. 
+     * Determines if exceptions should escape the ASO_Core object or be released to
+     * the method caller.
      * @var boolean
      */
     protected $_throwExceptions = false;
-    
+
     /**
      * Determines if exceptions should be logged.
      * @var boolean
      */
     protected $_logExceptions = false;
-    protected $_exceptionLog = '/dev/null';
-    
+
     /**
      * Determines if exceptions should be emailed to an administrator.
      * @var boolean
      */
     protected $_emailExceptions = false;
-    protected $_exceptionEmail = 'nobody';
-    
+
     /**
      * Default action if not specified in HTTP request URI
      * @var string
@@ -105,32 +103,34 @@ class ASO_Dispatch
      * @var string
      */
     public $action = '';
-    
+
     /**
      * Method from HTTP request URI
      * @var string
      */
     public $method = '';
-    
+
     /**
      * Extra data from HTTP request URI
      * @var mixed
      */
     public $extra = null;
-    
+
     /**
      * Constructor
      *
      * @return void
      */
     public function __construct()
-    {  
+    {
         global $CONFIG;
         $conf =& ASO_Registry('config');
         $conf = $this->config =& $CONFIG;
 
+        $this->_setupExceptionHandling();
+
         $this->_baseURL = preg_replace( '#index\.php.*#i', '', $_SERVER['PHP_SELF'] );
-        
+
         ASO_Display::factory( $this->config['display_backend'] );
     }
 
@@ -138,8 +138,8 @@ class ASO_Dispatch
      * Sets the throwExceptions flag and retreives the current status.
      *
      * By default, exceptions are caught by the ASO_Dispatch class. Enabling
-     * this flag will allow them to pass back to the caller. 
-     *    
+     * this flag will allow them to pass back to the caller.
+     *
      * @param boolean $flag
      * @return void
      */
@@ -150,39 +150,38 @@ class ASO_Dispatch
             $this->_throwExceptions = (bool) $flag;
             return $this;
         }
-        
+
         return $this->_throwExceptions;
     }
-    
+
     /**
      * Sets the logExceptions flag and retreives the current status.
      *
      * By default, exceptions are caught by the ASO_Dispatch class.
      * Enabling this flag will additionally log them to a file defined
      * by $CONFIG['exception_log'] (in app/Config.php).
-     *    
+     *
      * @param boolean $flag
      * @return void
      */
-    public function logExceptions( $flag = null, $logFile = '/dev/null' )
+    public function logExceptions( $flag = null )
     {
         if( $flag !== null )
         {
             $this->_logExceptions = (bool) $flag;
-            $this->_exceptionLog = $logFile;
             return $this;
         }
-        
+
         return $this->_logExceptions;
     }
-    
+
     /**
      * Sets the emailExceptions flag and retreives the current status.
      *
      * By default, exceptions are caught by the ASO_Dispatch class.
      * Enabling this flag will additionally email them to an administrator
-     * (or whoever's email is passed in as the 2nd parameter). 
-     *    
+     * (or whoever's email is passed in as the 2nd parameter).
+     *
      * @param boolean $flag
      * @return void
      */
@@ -191,43 +190,39 @@ class ASO_Dispatch
         if( $flag !== null )
         {
             $this->_emailExceptions = (bool) $flag;
-            $this->_exceptionEmail = $emailAddress;
             return $this;
         }
-        
+
         return $this->_emailExceptions;
     }
-    
+
     /**
      * Starts execution of the ASOworx framework.
-     * 
-     * @throws ASO_Exception  
+     *
+     * @throws ASO_Exception
      * @return void
      */
     public function run()
-    {    
+    {
         try
         {
             $this->_dispatch();
         }
         catch( Exception $e )
         {
-        	if( $this->logExceptions() )
-        	{
-			$message = "----------\n[{$this->config['app_name']}] Uncaught Exception:\n" . date('r') . "\n{$e->getMessage()} ({$e->getFile()}:{$e->getLine()})\n{$e->getTraceAsString()}\n\nPost: " . print_r($_POST, true) . "\n\nSession: " . print_r($this->controller->sess, true) . "\n\nServer: " . print_r($_SERVER, true) . "\n\n";
-			error_log($message, 3, $this->_exceptionLog);
-        	}
-        	
-        	if( $this->emailExceptions() )
-        	{
-        		$to = $this->_exceptionEmail;
-			$from = $this->_exceptionEmail;
-			$subject = "[{$this->config['app_name']}] Uncaught Exception";
-        		$message = "An uncaught exception occurred; here are the details\n\n{$e->getMessage()} ({$e->getFile()}:{$e->getLine()})\n{$e->getTraceAsString()}\n\nPost: " . print_r($_POST, true) . "\n\nSession: " . print_r($this->controller->sess, true) . "\n\nServer: " . print_r($_SERVER, true) . "\n\n";
-        		
-        		mail($to, $subject, $message, "From: {$from}\r\rX-Mailer: PHP/" . phpversion());
-        	}
-        	
+            // Log the exception if we're configured to do that
+            if( $this->logExceptions() )
+            {
+                call_user_func_array( array( $this->controller, 'logException'), array($e) );
+            }
+            
+            // Email the exception if we're configured to do that
+            if( $this->emailExceptions() )
+            {
+                call_user_func_array( array( $this->controller, 'emailException'), array($e) );
+            }
+             
+            // Throw the exception if we're configured to do that
             if( $this->throwExceptions() )
             {
                 throw $e;
@@ -250,10 +245,10 @@ class ASO_Dispatch
             }
         }
     }
-    
+
     /**
      * Dispatches an HTTP request to its assigned controller
-     * 
+     *
      * @throws ASO_Dispatch_Exception
      * @return void
      */
@@ -261,7 +256,7 @@ class ASO_Dispatch
     {
         $this->_loadRouting();
         $this->_splitURI();
-    
+
         // Check that controller class exists
         if( !file_exists( 'app/controllers/' . $this->action . '.php' ) )
         {
@@ -294,7 +289,7 @@ class ASO_Dispatch
         // Run the method
         $controller->{$this->method}( $this->extra );
         $controller->completeDispatch();
-        
+
         // Save the local vars to the controller
         $controller->action = $this->action;
         $controller->method = $this->method;
@@ -304,10 +299,10 @@ class ASO_Dispatch
         // Display back to the browser
         ASO_Display::display( $this->action . '/' . $this->method, get_object_vars( $controller ) );
     }
-    
+
     /**
      * Splits the HTTP request URI into action, method, extra data. Applies routing.
-     * 
+     *
      * @return void
      */
     protected function _splitURI()
@@ -317,7 +312,7 @@ class ASO_Dispatch
         $baseurl = preg_quote( $this->_baseURL );
         $method_string = preg_replace( "#^$baseurl#", '', $method_string );
         $method_string = preg_replace( '#\?.*#', '', $method_string );
-        
+
         // Apply routing
         if( isset( $this->config['routing'] ) )
         {
@@ -334,48 +329,48 @@ class ASO_Dispatch
                             $this->action = $matches[$mapping['action']];
                         else
                             $this->action = $mapping['action'];
-                    
+
                     }
-                    
+
                     if( isset( $mapping['method'] ) )
                     {
                         if( is_numeric( $mapping['method'] ) )
                             $this->method = $matches[$mapping['method']];
                         else
                             $this->method = $mapping['method'];
-                    
+
                     }
-                    
+
                     if( isset( $mapping['extra'] ) )
                     {
                         if( is_numeric( $mapping['extra'] ) )
                             $this->extra = $matches[$mapping['extra']];
                         else
                             $this->extra = $mapping['extra'];
-                    
+
                     }
-                    
+
                     // Don't do any more URI splitting if we've found a match
                     return;
                 }
             }
-            
+
         }
-        
+
         $tokens = explode( '/', $method_string );
-        
+
         // Get the action
         if( empty( $tokens[0] ) )
             $this->action = $this->_defaultAction;
         else
             $this->action = $tokens[0];
-        
+
         // Get the method
         if( empty( $tokens[1] ) )
             $this->method = '';
         else
             $this->method = $tokens[1];
-        
+
         // Get the extra data
         if( empty( $tokens[2] ) )
             $this->extra = null;
@@ -387,7 +382,7 @@ class ASO_Dispatch
      * Loads routing from app/Routing.php  Note: routes were
      * previously stored in app/Config.php but moved so that
      * they could be versioned.
-     * 
+     *
      * @return void
      */
     protected function _loadRouting()
@@ -405,7 +400,28 @@ class ASO_Dispatch
             }
         }
     }
-    
+
+    private function _setupExceptionHandling()
+    {
+        // Exception logging
+        if( !isset($this->config['log_exceptions']) || $this->config['log_exceptions'] !== false )
+        {
+            $this->logExceptions( true );
+        }
+
+        // Exception emailing
+        if( isset($this->config['email_exceptions']) && $this->config['email_exceptions'] )
+        {
+            $this->emailExceptions( true );
+        }
+
+        // Exception throwing
+        if( !isset($this->config['throw_exceptions']) || $this->config['throw_exceptions'] )
+        {
+            $this->throwExceptions( true );
+        }
+    }
+
 }
 
 class ASO_Dispatch_Exception extends ASO_Exception
