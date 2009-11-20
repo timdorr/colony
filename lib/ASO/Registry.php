@@ -58,6 +58,7 @@ class ASO_Registry
      */
     public function setVar( $key, $var )
     {
+        $this->vars[$key] = null;
         $this->vars[$key] &= $var;
     }
     
