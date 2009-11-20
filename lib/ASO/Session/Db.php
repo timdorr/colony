@@ -104,10 +104,18 @@ class ASO_Session_Db
 
             if( count($result) > 0 )
             {
-                $this->_data = unserialize( $result['data'] );
-                $this->_time = $result['time'];
-                
-                setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
+                // Make sure it hasn't timed out
+                if( $result['time'] >= time() - $this->timeout )
+                {
+                    $this->_data = unserialize( $result['data'] );
+                    $this->_time = $result['time'];
+                    
+                    setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
+                }
+                else
+                {
+                    $this->newSession();
+                }
             }
             else
             {

@@ -145,7 +145,7 @@ class ASO_Controller
         $this->sess =& $sess;
 
         $error =& ASO_Registry('error');
-        $error = $this->error =& new ASO_Error( $this );
+        $error = $this->error = new ASO_Error( $this );
 
         $this->_loadPlugins();
 
@@ -187,7 +187,8 @@ class ASO_Controller
     protected function _setEnvironment()
     {
         error_reporting( E_ALL ^ E_NOTICE );
-        set_magic_quotes_runtime( 0 );
+        if( version_compare( PHP_VERSION, '5.3.0', '<' ) )
+            set_magic_quotes_runtime( 0 );
     }
     
     /**
@@ -203,7 +204,7 @@ class ASO_Controller
             if( "." == $file || ".." == $file )
                 continue;
         
-            if( @eregi( ".*\.php", $file ) !== false )
+            if( preg_match( "/.*\.php/i", $file ) )
             {
                 require_once "plugins/$file";
                 $className = str_replace( '.php', '', $file );
