@@ -213,13 +213,23 @@ class ASO_Dispatch
             // Log the exception if we're configured to do that
             if( $this->logExceptions() )
             {
-                call_user_func_array( array( $this->controller, 'logException'), array($e) );
+                if(!isset( $this->controller )) {
+                    require_once('ASO/Controller.php');
+                    call_user_func_array( array( new ASO_Controller($this->config), 'logException'), array($e) );
+                } else {
+                    call_user_func_array( array( $this->controller, 'logException'), array($e) );
+                }
             }
             
             // Email the exception if we're configured to do that
             if( $this->emailExceptions() )
             {
-                call_user_func_array( array( $this->controller, 'emailException'), array($e) );
+                if(!isset( $this->controller )) {
+                    require_once('ASO/Controller.php');
+                    call_user_func_array( array( new ASO_Controller($this->config), 'emailException'), array($e) );
+                } else {
+                    call_user_func_array( array( $this->controller, 'emailException'), array($e) );
+                }
             }
              
             // Throw the exception if we're configured to do that
