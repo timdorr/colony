@@ -226,7 +226,7 @@ class ASO_Dispatch
             {
                 if(!isset( $this->controller )) {
                     require_once('ASO/Controller.php');
-                    call_user_func_array( array( new ASO_Controller($this->config), 'logException'), array($e) );
+                    call_user_func_array( array( new ASO_Controller($this->config), 'emailException'), array($e) );
                 } else {
                     call_user_func_array( array( $this->controller, 'emailException'), array($e) );
                 }
