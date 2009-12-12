@@ -166,6 +166,31 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 	}
 	
 	/**
+	 * Replaces an array of data in a table or creates a new row
+	 * @param string $table The table to replace info
+	 * @param array $data The data to replace with keys as field names
+	 * @return resource The ID of the query
+	 */
+	public function replace( $table = "", $data = array() )
+	{   
+		$columns = '';
+		$values = '';
+		
+		foreach( $data as $key => $value )
+		{
+            $value = mysql_escape_string( $value );
+
+			$columns .= " `$key`,";
+			$values  .= " '$value',";
+		}
+		
+		$columns = preg_replace( '/,$/', '', $columns );
+		$values  = preg_replace( '/,$/', '', $values );
+		
+        return $this->query( "REPLACE INTO $table( $columns ) VALUES ( $values )" );
+	}
+	
+	/**
 	 * Updates a row of data in a table
 	 * @param string $table The table to update
 	 * @param array $data The data to update to with keys as field names
