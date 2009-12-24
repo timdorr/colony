@@ -109,7 +109,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 		
 		if( mysql_num_rows( $this->_queryid ) > 0 )
 		{
-			return $this->fetch_array( $this->_queryid );
+			return $this->fetch_assoc( $this->_queryid );
 		}
 		else
 		{
@@ -153,7 +153,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 		
 		foreach( $data as $key => $value )
 		{
-            $value = mysql_escape_string( $value );
+            $value = mysql_real_escape_string( $value );
 
 			$columns .= " `$key`,";
 			$values  .= " '$value',";
@@ -178,7 +178,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 		
 		foreach( $data as $key => $value )
 		{
-            $value = mysql_escape_string( $value );
+            $value = mysql_real_escape_string( $value );
 
 			$columns .= " `$key`,";
 			$values  .= " '$value',";
@@ -203,7 +203,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
         $setters = '';
 		foreach( $data as $key => $value )
 		{
-            $value = mysql_escape_string( $value );
+            $value = mysql_real_escape_string( $value );
 			$setters .= " `$key`='$value',";
 		}
 		
