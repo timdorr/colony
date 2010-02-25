@@ -139,6 +139,49 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 			return array();
 		}
     }
+    
+    /**
+     * Grab the unique values from a table for a specific field.
+     * @param string $table The name of the table to pull from
+     * @param string $field The field to pull from
+     * @return array The unique values that make up the field
+     */
+    function queryFetchVar( $query_string, $index = 0, $no_debug = 0 )
+    {
+        $this->query( $query_string, $no_debug );
+        if ( mysql_num_rows( $this->_queryid ) > 0 ) {
+            $res = $this->fetch_row( $this->_queryid );
+            if ( is_numeric( $index ) ) {
+                if ( array_key_exists( $index, $res ) ) {
+                    return $res[ $index ];
+                }
+            } else if ( is_array( $index ) ) {
+                $ret = array();
+                foreach( $index as $r ) {
+                    if ( array_key_exists( $r, $res ) ) {
+                        $ret[] = $res[ $r ];
+                    }
+                }
+                return $ret;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Querys the db and checsk if one row exists.
+     * @param string $query_string The query string to run
+     * @param integer $no_debug Tells the function if it should record the query in the debug variables.
+     */
+    public function queryFetchExists( $query_string = "", $no_debug = 0 )
+    {
+        $this->query( $query_string, $no_debug );
+        if( mysql_num_rows( $this->_queryid ) > 0 ) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 	
 	/**
 	 * Inserts an array of data into a table
@@ -237,6 +280,19 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 
 		return mysql_fetch_assoc( $queryid );
 	}
+	
+    /**
+     * Wrapper for mysql_fetch_row()
+     * @param resource $queryid The query ID to use for this operation
+     * @return array The data from the current row
+     */
+    public function fetch_row( $queryid = -1 )
+    {
+        if( $queryid == -1 )
+            $queryid = $this->_queryid;
+
+        return mysql_fetch_row( $queryid );
+    }
 
 	/**
 	 * Wrapper for mysql_data_seek()
@@ -357,34 +413,151 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
     {
         return $this->queryFetch( "SELECT * FROM $table WHERE $where" );
     }
+
+    /**
+     * Delete an entry from a table.
+     * @param string $table The name of the table to delete from
+     * @param string $id A WHERE condition to match
+     * @return resource The ID of the query
+     */
+    public function delete( $table, $where )
+    {
+        return $this->query( "DELETE FROM $table WHERE $where" );
+    }
     
-	/**
-	 * Grab the enumeration/set values from a table for a specific field.
-	 * @param string $table The name of the table to pull from
-	 * @param string $field The field to pull from
-	 * @return array The values that make up the enumeration
-	 */
-	function enum_values( $table, $field ) {
-		$row = $this->queryFetch( "SHOW COLUMNS FROM `{$table}` LIKE '{$field}'" );
-		preg_match_all( "/'(.*?)'/" , $row["Type"], $enum_array );
-		$enum_fields = $enum_array[1];
-		return $enum_fields;
-	}
+    /**
+     * Grab the enumeration/set values from a table for a specific field.
+     * @param string $table The name of the table to pull from
+     * @param string $field The field to pull from
+     * @return array The values that make up the enumeration
+     */
+    function enum_values( $table, $field ) {
+        $row = $this->queryFetch( "SHOW COLUMNS FROM `{$table}` LIKE '{$field}'" );
+        preg_match_all( "/'(.*?)'/" , $row["Type"], $enum_array );
+        $enum_fields = $enum_array[1];
+        return $enum_fields;
+    }
+    
+    /**
+     * Grab the unique values from a table for a specific field.
+     * @param string $table The name of the table to pull from
+     * @param string $field The field to pull from
+     * @return array The unique values that make up the field
+     */
+    function unique_values( $table, $field ) {
+        $res = $this->queryFetchAll( "SELECT DISTINCT {$field} FROM {$table} WHERE {$field} IS NOT NULL ORDER BY {$field}" );
+        $return = array();
+        foreach ( $res as $r ) {
+            $return[] = $r[ $field ];
+        }
+        return $return;
+    }
 	
-	/**
-	 * Grab the unique values from a table for a specific field.
-	 * @param string $table The name of the table to pull from
-	 * @param string $field The field to pull from
-	 * @return array The unique values that make up the field
-	 */
-	function unique_values( $table, $field ) {
-		$res = $this->queryFetchAll( "SELECT DISTINCT {$field} FROM {$table} WHERE {$field} IS NOT NULL ORDER BY {$field}" );
-		$return = array();
-		foreach ( $res as $r ) {
-			$return[] = $r[ $field ];
-		}
-		return $return;
-	}
+    /**
+     * Returns the string representation of the processes in mysql
+     *
+     * @return string
+     */
+    function showprocesslist( $full = false ) {
+        if ( $full )
+            $fields = array( "Id", "User", "Host", "Db", "Command", "Time", "State", "Info" );
+        else
+            $fields = array( "Id", "Command", "Time", "State", "Info" );
+        $length = 20;
+        $borderline = "";
+        for( $x = 0; $x < count( $fields ); $x++ )
+            $borderline .= "+-".str_pad( "", $length, "-" )."-";
+        $borderline .= "+\n";
+
+        $query = $this->queryFetchAll( "SHOW PROCESSLIST;" );
+
+        $output = "";
+        $output .= "<pre>";
+        $output .= $borderline;
+        foreach( $fields as $name )
+            $output .= "| <b>".str_pad( $name, $length )."</b> ";
+        $output .= "|\n";
+        //$output .= "| ".str_pad( "Variable Name", $length1 )." | ".str_pad( "Value ", $length2 )." |\n";
+        $output .= $borderline;
+        foreach( $query as $row ) {
+            foreach( $row as $name => $value ) {
+                if ( !in_array( $name, $fields ) ) continue;
+                $output .= "| ".str_pad( $value, $length )." ";
+            }
+            $output .= "|\n";
+        }
+        $output .= $borderline;
+        $output .= "</pre>";
+        return $output;
+    }
+
+
+    /**
+     * Returns the string representation of the processes in mysql
+     *
+     * @return string
+     */
+    function showopentables( $full = false ) {
+        if ( $full )
+            $fields = array( "Database", "Table", "In_use", "Name_locked" );
+        else
+            $fields = array( "Table", "In_use", "Name_locked" );
+        $length = 20;
+        $borderline = "";
+        for( $x = 0; $x < count( $fields ); $x++ )
+            $borderline .= "+-".str_pad( "", $length, "-" )."-";
+        $borderline .= "+\n";
+
+        $query = $this->queryFetchAll( "SHOW OPEN TABLES;" );
+
+        $output = "";
+        $output .= "<pre>";
+        $output .= $borderline;
+        foreach( $fields as $name )
+            $output .= "| <b>".str_pad( $name, $length )."</b> ";
+        $output .= "|\n";
+        //$output .= "| ".str_pad( "Variable Name", $length1 )." | ".str_pad( "Value ", $length2 )." |\n";
+        $output .= $borderline;
+        foreach( $query as $row ) {
+            foreach( $row as $name => $value ) {
+                if ( !in_array( $name, $fields ) ) continue;
+                $output .= "| ".str_pad( $value, $length )." ";
+            }
+            $output .= "|\n";
+        }
+        $output .= $borderline;
+        $output .= "</pre>";
+        return $output;
+    }
+
+    /**
+     * Returns the string representation of the status of mysql
+     *
+     * @return string
+     */
+    function showstatus() {
+        $length1 = 28;
+        $length2 = 16;
+        $borderline .= "+-".str_pad( "", $length1, "-" )."-+-".str_pad( "", $length2, "-" )."-+\n";
+
+        $query = $this->queryFetchAll( "SHOW STATUS;" );
+
+        $output = "";
+        $output .= "<pre>";
+        $output .= $borderline;
+        $output .= "| <b>".str_pad( "Variable Name", $length1 )."</b> | <b>".str_pad( "Value ", $length2 )."</b> |\n";
+        $output .= $borderline;
+        foreach( $query as $line ) {
+            $line["Variable_name"] = str_pad( $line["Variable_name"], $length1 );
+            if ( is_numeric( $line["Value"] ) )
+                $line["Value"] = number_format( $line["Value"] );
+            $line["Value"] = str_pad( $line["Value"], $length2, " " );
+            $output .= "| ".$line["Variable_name"]." | ".$line["Value"]." |\n";
+        }
+        $output .= $borderline;
+        $output .= "</pre>";
+        return $output;
+    }
     
     /**
      * Returns the string representation of the object
@@ -392,19 +565,19 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
      * @return string
      */
     public function __toString() {
-    	$out = "<pre>";
-    	$out .= "Database Object\n";
-    	$out .= "{\n";
-    	$out .= "\t[connected] => ".( $this->_connection == null ? "false" : "true" )."\n";
-    	
-    	$out .= "\t[last_query] => ".$this->query."\n";
-    	$out .= "\t[querycount] => ".$this->querycount."\n";
-    	$out .= "\t[querytimes] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querytimes, true ) )."\n";
-    	$out .= "\t[querylist] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querylist, true ) )."\n";
+        $out = "<pre>";
+        $out .= "Database Object\n";
+        $out .= "{\n";
+        $out .= "\t[connected] => ".( $this->_connection == null ? "false" : "true" )."\n";
+        
+        $out .= "\t[last_query] => ".$this->query."\n";
+        $out .= "\t[querycount] => ".$this->querycount."\n";
+        $out .= "\t[querytimes] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querytimes, true ) )."\n";
+        $out .= "\t[querylist] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->querylist, true ) )."\n";
 
-    	$out .= "}\n";
-    	$out .= "</pre>";
-    	return $out;
+        $out .= "}\n";
+        $out .= "</pre>";
+        return $out;
     }
 
 }

@@ -296,7 +296,15 @@ class ASO_Dispatch
         if( !method_exists( $controller, $this->method ) )
             throw new ASO_Dispatch_Exception( 'Method not found: ' . $action . '::' . $this->method );
 
+        // Save the local vars to the controller
+        $controller->action = $this->action;
+        $controller->method = $this->method;
+        $controller->extra = $this->extra;
+        $controller->_baseURL = $this->_baseURL;
+
         // Run the method
+        if ( method_exists( $controller, "_setup" ) )
+            $controller->_setup();
         $controller->{$this->method}( $this->extra );
         $controller->completeDispatch();
 
@@ -353,10 +361,23 @@ class ASO_Dispatch
 
                     if( isset( $mapping['extra'] ) )
                     {
-                        if( is_numeric( $mapping['extra'] ) )
-                            $this->extra = $matches[$mapping['extra']];
+                        if ( is_array( $mapping['extra'] ) ) {
+                            $this->extra = array();
+                            foreach( $mapping['extra'] as $n ) {
+                                $temp = null;
+                                if ( is_numeric( $n ) )
+                                    $temp = ( array_key_exists( $n, $matches ) ) ? $matches[$n] : null;
+                                else
+                                    $temp = ( !empty( $n ) ) ? $n : null;
+                                if ( !is_null( $temp ) )
+                                    $this->extra[] = $temp;
+                            }
+                            if ( count( $this->extra ) <= 0 )
+                                $this->extra = null;
+                        } else if ( is_numeric( $mapping['extra'] ) )
+                            $this->extra = ( array_key_exists( $mapping['extra'], $matches ) ) ? $matches[$mapping['extra']] : null;
                         else
-                            $this->extra = $mapping['extra'];
+                            $this->extra = ( !empty( $mapping['extra'] ) ) ? $mapping['extra'] : null;
 
                     }
 
@@ -367,7 +388,25 @@ class ASO_Dispatch
 
         }
 
-        $tokens = explode( '/', $method_string );
+        //$tokens = explode( '/', $method_string );
+        $tokens = array();
+        if ( ( $pos = strpos( $method_string, "/" ) ) !== false ) {
+            $tokens[0] = substr( $method_string, 0, $pos );
+            $method_string = substr( $method_string, $pos + 1 );
+            if ( ( $pos = strpos( $method_string, "/" ) ) !== false ) {
+                $tokens[1] = substr( $method_string, 0, $pos );
+                $method_string = substr( $method_string, $pos + 1 );
+                if ( ( $pos = strpos( $method_string, "/" ) ) !== false ) {
+                    $tokens[2] = explode( "/", $method_string );
+                } else {
+                    $tokens[2] = $method_string;
+                }
+            } else {
+                $tokens[1] = $method_string;
+            }
+        } else {
+            $tokens[0] = $method_string;
+        }
 
         // Get the action
         if( empty( $tokens[0] ) )

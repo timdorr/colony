@@ -150,7 +150,7 @@ class ASO_Controller
         $this->_loadPlugins();
 
         // Run the setup function, if defined
-        $this->_setup();
+        //$this->_setup();
     }
     
     /**
