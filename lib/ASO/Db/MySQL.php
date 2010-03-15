@@ -196,7 +196,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 		
 		foreach( $data as $key => $value )
 		{
-            $value = mysql_real_escape_string( $value );
+            $value = $this->escape_string( $value );
 
 			$columns .= " `$key`,";
 			$values  .= " '$value',";
@@ -221,7 +221,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 		
 		foreach( $data as $key => $value )
 		{
-            $value = mysql_real_escape_string( $value );
+            $value = $this->escape_string( $value );
 
 			$columns .= " `$key`,";
 			$values  .= " '$value',";
@@ -246,7 +246,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
         $setters = '';
 		foreach( $data as $key => $value )
 		{
-            $value = mysql_real_escape_string( $value );
+            $value = $this->escape_string( $value );
 			$setters .= " `$key`='$value',";
 		}
 		
@@ -332,6 +332,18 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 			$queryid = $this->_queryid;
 
 		return mysql_affected_rows( $queryid );
+	}
+
+	/**
+	 * Wrapper for mysql_real_escape_string()
+	 * @param string The string to be escaped
+	 * @return string The string cleaned of any offending values
+	 */
+	public function escape_string( $string )
+	{
+    	$this->connect();
+	
+		return mysql_real_escape_string( $string );
 	}
 
 	/**

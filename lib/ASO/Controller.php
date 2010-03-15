@@ -219,7 +219,7 @@ class ASO_Controller
      * 
      * @return void
      */
-    protected function _setup() { }
+    public function _setup() { }
     
     /**
      * Default callback for logging runtime exceptions.
