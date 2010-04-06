@@ -27,7 +27,7 @@
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-set_include_path( "lib:app:var" );
+set_include_path( "lib" . PATH_SEPARATOR . "app" . PATH_SEPARATOR . "var" . PATH_SEPARATOR . get_include_path() );
 
 require_once 'Config.php';
 require_once 'ASO/Dispatch.php';
