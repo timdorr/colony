@@ -436,8 +436,6 @@ class ASO_Dispatch
      */
     protected function _loadRouting()
     {
-        $dir = opendir( './app/plugins/' );
-
         if( file_exists( './app/Routing.php' ) )
         {
             include( './app/Routing.php' );

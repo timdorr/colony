@@ -146,11 +146,6 @@ class ASO_Controller
 
         $error =& ASO_Registry('error');
         $error = $this->error = new ASO_Error( $this );
-
-        $this->_loadPlugins();
-
-        // Run the setup function, if defined
-        //$this->_setup();
     }
     
     /**
@@ -189,29 +184,6 @@ class ASO_Controller
         error_reporting( E_ALL ^ E_NOTICE );
         if( version_compare( PHP_VERSION, '5.3.0', '<' ) )
             set_magic_quotes_runtime( 0 );
-    }
-    
-    /**
-     * Loads and initializes plugins in the app directory
-     * 
-     * @return void
-     */
-    protected function _loadPlugins()
-    {
-        $dir = opendir( './app/plugins/' );
-        while( ( $file = readdir( $dir ) ) !== false) 
-        {
-            if( "." == $file || ".." == $file )
-                continue;
-        
-            if( preg_match( "/.*\.php/i", $file ) )
-            {
-                require_once "plugins/$file";
-                $className = str_replace( '.php', '', $file );
-                if ( method_exists( $className, "init" ) )
-	                call_user_func( $className.'::init' );
-            }
-        }
     }
     
     /**
