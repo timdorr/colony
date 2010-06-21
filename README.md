@@ -10,7 +10,6 @@ Formerly known as ASOworx.
 License
 -------
 
-Colony
 Copyright (c) Army of Bees (www.armyofbees.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
