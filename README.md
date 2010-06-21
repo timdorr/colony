@@ -7,8 +7,6 @@ Speed is the primary focus of the project, both when it comes to runtime executi
 
 Formerly known as ASOworx.
 
-***
-
 License
 -------
 
