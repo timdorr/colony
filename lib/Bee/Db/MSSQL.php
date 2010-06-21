@@ -28,9 +28,9 @@
  */
 
 /**
- * @see ASO_Db_Abstract
+ * @see Bee_Db_Abstract
  */
-require_once 'ASO/Db/Abstract.php';
+require_once 'Bee/Db/Abstract.php';
 
 /**
  * MSSQL database adapter.
@@ -40,7 +40,7 @@ require_once 'ASO/Db/Abstract.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Db_MSSQL extends ASO_Db_Abstract
+class Bee_Db_MSSQL extends Bee_Db_Abstract
 {
     /**
      * Connects to the defined server and selects the defined database.
@@ -64,12 +64,12 @@ class ASO_Db_MSSQL extends ASO_Db_Abstract
 
         if ( !$this->_connection )
         {
-            throw new ASO_Db_MSSQL_Exception( "MSSQL Error: " . mssql_get_last_message() );
+            throw new Bee_Db_MSSQL_Exception( "MSSQL Error: " . mssql_get_last_message() );
         }
 
         if ( !mssql_select_db( $this->config['db_name'], $this->_connection ) )
         {
-            throw new ASO_Db_MSSQL_Exception( "MSSQL Error: " . mssql_get_last_message() );
+            throw new Bee_Db_MSSQL_Exception( "MSSQL Error: " . mssql_get_last_message() );
         }
     }
 
@@ -95,7 +95,7 @@ class ASO_Db_MSSQL extends ASO_Db_Abstract
         $this->_queryid = mssql_query( $query_string, $this->_connection );
 
         if( !$this->_queryid )
-            throw new ASO_Db_MSSQL_Exception("Could not compete a query to the database. MSSQL error: " . mssql_get_last_message() );
+            throw new Bee_Db_MSSQL_Exception("Could not compete a query to the database. MSSQL error: " . mssql_get_last_message() );
     }
 
     public function primary_table() {
@@ -397,5 +397,5 @@ class ASO_Db_MSSQL extends ASO_Db_Abstract
 
 }
 
-class ASO_Db_MSSQL_Exception extends ASO_Db_Abstract_Exception
+class Bee_Db_MSSQL_Exception extends Bee_Db_Abstract_Exception
 {}

@@ -26,52 +26,48 @@
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-
+ 
 /**
- * @see ASO_Exception
+ * @see Bee_Exception
  */
-require_once 'ASO/Exception.php';
+require_once 'Bee/Exception.php';
 
 /**
- * Abstract session handler backend class.
+ * SQL Database abstraction layer.
  *
  * @category   Colony
  * @package    ASO
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-abstract class ASO_Session_Abstract
-{
+class Bee_Db
+{   
     /**
-     * Session ID
-     * @var string
+     * Creates the database adapter using the name passed.
+     *    
+     * @param string $adapter The name of the adapter to use.
+     * @param array $config The configuration to pass to the adapter.
+     * @return Bee_Db_Abstract
      */
-    protected $_id = "";
-    
-    /**
-     * Session data
-     * @var array
-     */
-    protected $_data = array();
+    public static function factory( $adapter, $config = array() )
+    {
+        // Verify that adapter parameters are in an array.
+        if( !is_array( $config ) )
+            throw new Bee_Db_Exception('Adapter parameters must be in an array');
+            
+        // Verify that an adapter name has been specified.
+        if( !is_string( $adapter ) || empty( $adapter ) )
+            throw new Bee_Db_Exception( 'Adapter name must be specified in a string' );
+            
+        // Load the adapter class.
+        require_once 'Bee/Db/'.$adapter.'.php';
 
-    /**
-     * Timeout for sessions
-     * @var int
-     */
-    protected $timeout = 0;
+        // Create an instance of the adapter, passing the config to it.
+        $adapterName = 'Bee_Db_' . $adapter;
+        return new $adapterName( $config );
+    }
 
-    /**
-     * Domain for the session cookie
-     * @var string
-     */
-    protected $domain = '';
-
-    /**
-     * Path for the session cookie
-     * @var string
-     */
-    protected $path = '';
 }
 
-class ASO_Session_Abstract_Exception extends ASO_Exception
+class Bee_Db_Exception extends Bee_Exception
 {}

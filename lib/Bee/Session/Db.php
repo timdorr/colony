@@ -28,34 +28,33 @@
  */
  
 /**
- * @see ASO_Session_Abstract
+ * @see Bee_Session_Abstract
  */
-require_once 'ASO/Session/Abstract.php';
+require_once 'Bee/Session/Abstract.php';
 
 /**
- * @see ASO_Db_Abstract
+ * @see Bee_Db_Abstract
  */
-require_once 'ASO/Db/Abstract.php';
+require_once 'Bee/Db/Abstract.php';
 
 /**
- * @see ASO_Input
+ * @see Bee_Input
  */
-require_once 'ASO/Input.php';
+require_once 'Bee/Input.php';
 
 /**
- * Session backend using the built-in PHP session handlers
+ * Session backend using an Bee_Db database
  *
  * @category   Colony
  * @package    ASO
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Session_Native
+class Bee_Session_Db
 {
-
     /**
      * Database object
-     * @var ASO_Db_Abstract
+     * @var Bee_Db_Abstract
      */
     private $_db = null;
 
@@ -68,13 +67,13 @@ class ASO_Session_Native
     {
         // Verify that configuration is in an array.
         if( !is_array( $config ) )
-            throw new ASO_Session_Native_Exception('Configuration must be in an array');
+            throw new Bee_Session_Db_Exception('Configuration must be in an array');
 
         // Verify that a db object is passed
         if( !isset( $config['db'] ) )
-            throw new ASO_Session_Native_Exception('Configuration is missing db');
-        if( !($config['db'] instanceof ASO_Db_Abstract) )
-            throw new ASO_Session_Native_Exception('Configuration is not ASO_Db_Abstract');
+            throw new Bee_Session_Db_Exception('Configuration is missing db');
+        if( !($config['db'] instanceof Bee_Db_Abstract) )
+            throw new Bee_Session_Db_Exception('Configuration is not Bee_Db_Abstract');
     
         $this->_db =& $config['db'];
         
@@ -90,26 +89,33 @@ class ASO_Session_Native
      */
     private function _loadSession()
     {
-
         // Check if we've got an existing session stored
-        $input =& ASO_Input::filterInput();
-        if ( !array_key_exists( 'session', $input ) )
+        $Bee_ =& Bee_Input::filterInput();
+        if ( !array_key_exists( 'session', $Bee_ ) )
         {
             $this->newSession();
         }
         else
         {
-        
-			session_start();
+            $this->_id = $Bee_['session'];
 
-            $this->_id = $input['session'];
+            // Grab the session data from the database
+            $result = $this->_db->get( 'session', "session_id = '{$this->_id}'" );
 
-            if ( $_SESSION['session_id'] == $this->_id )
+            if( count($result) > 0 )
             {
-                $this->_data = $_SESSION['data'];
-                $this->_time = $_SESSION['time'];
-                
-                setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
+                // Make sure it hasn't timed out
+                if( $result['time'] >= time() - $this->timeout )
+                {
+                    $this->_data = unserialize( $result['data'] );
+                    $this->_time = $result['time'];
+                    
+                    setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
+                }
+                else
+                {
+                    $this->newSession();
+                }
             }
             else
             {
@@ -130,12 +136,11 @@ class ASO_Session_Native
         $this->_data = array();
 
         setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
-        
-		session_start();
 
-		$_SESSION['session_id'] = $this->_id;
-		$_SESSION['data'] = array();
-		$_SESSION['time'] = time();
+        $this->_db->insert( 'session',
+                            array( 'session_id' => $this->_id,
+                                   'data' => serialize( array() ),
+                                   'time' => time() ) );
     }
 
     /**
@@ -146,14 +151,16 @@ class ASO_Session_Native
      */
     public function saveSession( &$data )
     {
-    
         $this->_data = $data;
-        
-		session_start();
 
-		$_SESSION['session_id'] = $this->_id;
-		$_SESSION['data'] = $data;
-		$_SESSION['time'] = time();
+        $this->_db->update( 'session',
+                            array( 'data' => serialize( $data ),
+                                   'time' => time() ),
+                            'session_id',
+                            $this->_id );
+
+        // Clear out old sessions
+		$this->_db->query( "DELETE FROM session WHERE time < " . ( time() - $this->timeout ) );
     }
     
     /**
@@ -193,14 +200,13 @@ class ASO_Session_Native
     	$out .= "{\n";
     	$out .= "\t[session_id] => ".$this->_id."\n";
     	$out .= "\t[time] => ".date( DATE_RFC822, $this->_time )."\n";
-    	$out .= "\t[data] => ".print_r( $this->_data, true )."\n";
+    	$out .= "\t[data] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->_data, true ) )."\n";
     	$out .= "}\n";
     	$out .= "</pre>";
     	return $out;
     }
-
+    
 }
 
-
-class ASO_Session_Native_Exception extends ASO_Session_Abstract_Exception
+class Bee_Session_Db_Exception extends Bee_Session_Abstract_Exception
 {}

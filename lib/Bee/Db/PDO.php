@@ -1,8 +1,46 @@
 <?php
+/**
+ * Colony
+ * Copyright (c) Army of Bees (www.armyofbees.com)
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ *
+ * @category   Colony
+ * @package    ASO
+ * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
+ * @license    http://www.opensource.org/licenses/mit-license.php MIT License
+ */
+ 
+/**
+ * @see Bee_Db_Abstract
+ */
+require_once 'Bee/Db/Abstract.php';
 
-require_once 'ASO/Db/Abstract.php';
-
-class ASO_Db_PDO extends ASO_Db_Abstract
+/**
+ * PDO database adapter.
+ *
+ * @category   Colony
+ * @package    ASO
+ * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
+ * @license    http://www.opensource.org/licenses/mit-license.php MIT License
+ */
+class Bee_Db_PDO extends Bee_Db_Abstract
 {
     public function connect()
     {
@@ -29,7 +67,7 @@ class ASO_Db_PDO extends ASO_Db_Abstract
             
         } catch (PDOException $pdoe) {
             $this->_connection = null;
-            throw new ASO_Db_PDO_Exception("PDO Error: " . $pdoe->getMessage());
+            throw new Bee_Db_PDO_Exception("PDO Error: " . $pdoe->getMessage());
         }
     }
 
@@ -96,7 +134,7 @@ class ASO_Db_PDO extends ASO_Db_Abstract
 
         if (empty($res)) {
             $arr = $this->_connection->errorInfo();
-            throw new ASO_Db_PDO_Exception("PDO Error: " . $arr[2]);
+            throw new Bee_Db_PDO_Exception("PDO Error: " . $arr[2]);
         }
 
         return $res;
@@ -134,7 +172,7 @@ class ASO_Db_PDO extends ASO_Db_Abstract
     }
 
     public function num_rows($query_id = -1) {
-        throw new ASO_Db_PDO_Exception("num_rows is incompatible with PDO, use count() instead");
+        throw new Bee_Db_PDO_Exception("num_rows is incompatible with PDO, use count() instead");
     }
 
     public function insert($table = "", $data = array()) {
@@ -163,7 +201,7 @@ class ASO_Db_PDO extends ASO_Db_Abstract
 
 		if ($res == FALSE) {
             $arr = $stmt->errorInfo();
-            throw new ASO_Db_PDO_Exception("PDO Error: " . $arr[2]);
+            throw new Bee_Db_PDO_Exception("PDO Error: " . $arr[2]);
         }
         
 		return $res;
@@ -195,7 +233,7 @@ class ASO_Db_PDO extends ASO_Db_Abstract
 
 		if ($res == FALSE) {
             $arr = $stmt->errorInfo();
-            throw new ASO_Db_PDO_Exception("PDO Error: " . $arr[2]);
+            throw new Bee_Db_PDO_Exception("PDO Error: " . $arr[2]);
         }
         
 		return $res;
@@ -203,4 +241,4 @@ class ASO_Db_PDO extends ASO_Db_Abstract
     }
 }
 
-class ASO_Db_PDO_Exception extends ASO_Db_Abstract_Exception {}
+class Bee_Db_PDO_Exception extends Bee_Db_Abstract_Exception {}

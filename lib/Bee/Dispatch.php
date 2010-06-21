@@ -31,24 +31,24 @@
 set_error_handler(create_function('$x, $y', 'throw new Exception($y, $x);'), E_ALL & ~E_NOTICE);
 
 /**
- * @see ASO_Exception
+ * @see Bee_Exception
  */
-require_once 'ASO/Exception.php';
+require_once 'Bee/Exception.php';
 
 /**
- * @see ASO_Registry
+ * @see Bee_Registry
  */
-require_once 'ASO/Registry.php';
+require_once 'Bee/Registry.php';
 
 /**
- * @see ASO_Input
+ * @see Bee_Input
  */
-require_once 'ASO/Input.php';
+require_once 'Bee/Input.php';
 
 /**
- * @see ASO_Display
+ * @see Bee_Display
  */
-require_once 'ASO/Display.php';
+require_once 'Bee/Display.php';
 
 /**
  * Dispatcher to route HTTP requests into controllers and back out to a display
@@ -59,7 +59,7 @@ require_once 'ASO/Display.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Dispatch
+class Bee_Dispatch
 {
     /**
      * Application config
@@ -74,7 +74,7 @@ class ASO_Dispatch
     protected $_baseURL = null;
 
     /**
-     * Determines if exceptions should escape the ASO_Core object or be released to
+     * Determines if exceptions should escape the Bee_Core object or be released to
      * the method caller.
      * @var boolean
      */
@@ -124,20 +124,20 @@ class ASO_Dispatch
     public function __construct()
     {
         global $CONFIG;
-        $conf =& ASO_Registry('config');
+        $conf =& Bee_Registry('config');
         $conf = $this->config =& $CONFIG;
 
         $this->_setupExceptionHandling();
 
         $this->_baseURL = preg_replace( '#index\.php.*#i', '', $_SERVER['PHP_SELF'] );
 
-        ASO_Display::factory( $this->config['display_backend'] );
+        Bee_Display::factory( $this->config['display_backend'] );
     }
 
     /**
      * Sets the throwExceptions flag and retreives the current status.
      *
-     * By default, exceptions are caught by the ASO_Dispatch class. Enabling
+     * By default, exceptions are caught by the Bee_Dispatch class. Enabling
      * this flag will allow them to pass back to the caller.
      *
      * @param boolean $flag
@@ -157,7 +157,7 @@ class ASO_Dispatch
     /**
      * Sets the logExceptions flag and retreives the current status.
      *
-     * By default, exceptions are caught by the ASO_Dispatch class.
+     * By default, exceptions are caught by the Bee_Dispatch class.
      * Enabling this flag will additionally log them to a file defined
      * by $CONFIG['exception_log'] (in app/Config.php).
      *
@@ -178,7 +178,7 @@ class ASO_Dispatch
     /**
      * Sets the emailExceptions flag and retreives the current status.
      *
-     * By default, exceptions are caught by the ASO_Dispatch class.
+     * By default, exceptions are caught by the Bee_Dispatch class.
      * Enabling this flag will additionally email them to an administrator
      * (or whoever's email is passed in as the 2nd parameter).
      *
@@ -199,7 +199,7 @@ class ASO_Dispatch
     /**
      * Starts execution of the Colony framework.
      *
-     * @throws ASO_Exception
+     * @throws Bee_Exception
      * @return void
      */
     public function run()
@@ -215,7 +215,7 @@ class ASO_Dispatch
             {
                 if(!isset( $this->controller )) {
                     require_once('ASO/Controller.php');
-                    call_user_func_array( array( new ASO_Controller($this->config), 'logException'), array($e) );
+                    call_user_func_array( array( new Bee_Controller($this->config), 'logException'), array($e) );
                 } else {
                     call_user_func_array( array( $this->controller, 'logException'), array($e) );
                 }
@@ -226,7 +226,7 @@ class ASO_Dispatch
             {
                 if(!isset( $this->controller )) {
                     require_once('ASO/Controller.php');
-                    call_user_func_array( array( new ASO_Controller($this->config), 'emailException'), array($e) );
+                    call_user_func_array( array( new Bee_Controller($this->config), 'emailException'), array($e) );
                 } else {
                     call_user_func_array( array( $this->controller, 'emailException'), array($e) );
                 }
@@ -242,7 +242,7 @@ class ASO_Dispatch
                 if( file_exists( 'app/views/error.tpl' ) )
                 {
                     $error_message = preg_replace( '/mysql_connect\([^)]+?\)/im', 'mysql_connect()', $e );
-                    ASO_Display::display( 'error', array( 'config' => $this->config,
+                    Bee_Display::display( 'error', array( 'config' => $this->config,
                                                           'error' => $error_message,
                                                           'exception' => $e ) );
                 }
@@ -259,7 +259,7 @@ class ASO_Dispatch
     /**
      * Dispatches an HTTP request to its assigned controller
      *
-     * @throws ASO_Dispatch_Exception
+     * @throws Bee_Dispatch_Exception
      * @return void
      */
     protected function _dispatch()
@@ -273,12 +273,12 @@ class ASO_Dispatch
             if( $this->throwExceptions() || !file_exists( 'app/views/404.tpl' ) )
             {
                 header( 'HTTP/1.1 404 Not Found' );
-                throw new ASO_Dispatch_Exception( "Controller ($this->action) not found" );
+                throw new Bee_Dispatch_Exception( "Controller ($this->action) not found" );
             }
             else
             {
                 header( 'HTTP/1.1 404 Not Found' );
-                ASO_Display::display( '404' );
+                Bee_Display::display( '404' );
                 return false;
             }
         }
@@ -294,7 +294,7 @@ class ASO_Dispatch
 
         // Check that method call exists
         if( !method_exists( $controller, $this->method ) )
-            throw new ASO_Dispatch_Exception( 'Method not found: ' . $action . '::' . $this->method );
+            throw new Bee_Dispatch_Exception( 'Method not found: ' . $action . '::' . $this->method );
 
         // Save the local vars to the controller
         $controller->action = $this->action;
@@ -315,7 +315,7 @@ class ASO_Dispatch
         $controller->_baseURL = $this->_baseURL;
 
         // Display back to the browser
-        ASO_Display::display( $this->action . '/' . $this->method, get_object_vars( $controller ) );
+        Bee_Display::display( $this->action . '/' . $this->method, get_object_vars( $controller ) );
     }
 
     /**
@@ -471,5 +471,5 @@ class ASO_Dispatch
 
 }
 
-class ASO_Dispatch_Exception extends ASO_Exception
+class Bee_Dispatch_Exception extends Bee_Exception
 {}

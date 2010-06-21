@@ -28,9 +28,9 @@
  */
 
 /**
- * @see ASO_Exception
+ * @see Bee_Exception
  */
-require_once 'ASO/Exception.php';
+require_once 'Bee/Exception.php';
 
 /**
  * Input filtering. Removes bad characters and reduces potential injection vectors
@@ -40,7 +40,7 @@ require_once 'ASO/Exception.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Input 
+class Bee_Input 
 {
     /**
      * Cached input data
@@ -198,5 +198,5 @@ class ASO_Input
     }
 }
 
-class ASO_Input_Exception extends ASO_Exception
+class Bee_Input_Exception extends Bee_Exception
 {}

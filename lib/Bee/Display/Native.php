@@ -27,12 +27,34 @@
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+/**
+ * @see Bee_Display
+ */
+require_once 'Bee/Display.php';
 
 /**
+ * Display backend for native PHP files
+ *
  * @category   Colony
  * @package    ASO
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Exception extends Exception
+class Bee_Display_Native
+{
+    /**
+     * Display the data through the PHP template
+     *
+     * @param array $view The template to use
+     * @param array $data The data to be used in the template
+     * @return void
+     */
+    public function runDisplay( $view, $data )
+    {
+        
+    }
+
+}
+
+class Bee_Display_Native_Exception extends Bee_Display_Exception
 {}

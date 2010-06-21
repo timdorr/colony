@@ -28,22 +28,54 @@
  */
 
 /**
- * @see ASO_Display
+ * @see Bee_Display
  */
-require_once 'ASO/Display.php';
+require_once 'Bee/Display.php';
 
 /**
- * Display backend for native PHP files
+ * @see Bee_Error
+ */
+require_once 'Bee/Error.php';
+
+
+/** Smarty */
+require_once 'Smarty/Smarty.class.php';
+
+/**
+ * Display backend for the Smarty templating engine
  *
  * @category   Colony
  * @package    ASO
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Display_Native
+class Bee_Display_Smarty
 {
     /**
-     * Display the data through the PHP template
+     * Smarty instance
+     * @var Smarty
+     */
+    private $smarty = null;
+
+    /** 
+     * Constructor
+     *
+     * Instantiates Smarty for later awesomeness
+     */
+    public function __construct()
+    {    
+        $this->smarty = new Smarty();
+        
+        $this->smarty->template_dir = './app/views/';
+        $this->smarty->compile_dir = './var/cache/';
+        $this->smarty->config_dir = './var/cache/';
+        $this->smarty->cache_dir = './var/cache/';
+        
+        $this->smarty->register_function( 'error', array( 'Bee_Error', 'formatError' ) );
+    }
+
+    /**
+     * Display the data through Smarty
      *
      * @param array $view The template to use
      * @param array $data The data to be used in the template
@@ -51,10 +83,25 @@ class ASO_Display_Native
      */
     public function runDisplay( $view, $data )
     {
+        $this->smarty->assign( $data );
+        $this->smarty->assign( 'input', Bee_Input::filterInput() );
+        $this->smarty->assign( 'sess', Bee_Registry('sess') );
         
+        // GZip compression
+        //ob_start( 'ob_gzhandler' );
+        
+        if( file_exists( 'app/views/global.tpl' ) && $view != 'error' && $view != '404' )
+        {        
+            $this->smarty->assign( 'templatefile', $view . '.tpl' );
+            $this->smarty->display( 'global.tpl' );
+        }
+        else
+        {
+            $this->smarty->display( $view . '.tpl' );
+        }
     }
 
 }
 
-class ASO_Display_Native_Exception extends ASO_Display_Exception
+class Bee_Display_Smarty_Exception extends Bee_Display_Exception
 {}

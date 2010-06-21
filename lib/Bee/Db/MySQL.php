@@ -28,9 +28,9 @@
  */
 
 /**
- * @see ASO_Db_Abstract
+ * @see Bee_Db_Abstract
  */
-require_once 'ASO/Db/Abstract.php';
+require_once 'Bee/Db/Abstract.php';
 
 /**
  * MySQL database adapter.
@@ -40,7 +40,7 @@ require_once 'ASO/Db/Abstract.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Db_MySQL extends ASO_Db_Abstract
+class Bee_Db_MySQL extends Bee_Db_Abstract
 {
 	/**
 	 * Connects to the defined server and selects the defined database. 
@@ -63,12 +63,12 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 
 		if ( !$this->_connection )
 		{
-			throw new ASO_Db_MySQL_Exception( "MySQL Error: " . mysql_error() );
+			throw new Bee_Db_MySQL_Exception( "MySQL Error: " . mysql_error() );
 		}
 
 		if ( !mysql_select_db( $this->config['db_name'], $this->_connection ) )
         {
-			throw new ASO_Db_MySQL_Exception( "MySQL Error: " . mysql_error() );
+			throw new Bee_Db_MySQL_Exception( "MySQL Error: " . mysql_error() );
         }
 	}
 
@@ -94,7 +94,7 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 		$this->_queryid = @mysql_query( $query_string, $this->_connection );
 		
 		if( mysql_errno() != 0 )
-            throw new ASO_Db_MySQL_Exception("Could not compete a query to the database. MySQL error: " . mysql_error() );
+            throw new Bee_Db_MySQL_Exception("Could not compete a query to the database. MySQL error: " . mysql_error() );
 	}
 
 	/**
@@ -594,5 +594,5 @@ class ASO_Db_MySQL extends ASO_Db_Abstract
 
 }
 
-class ASO_Db_MySQL_Exception extends ASO_Db_Abstract_Exception
+class Bee_Db_MySQL_Exception extends Bee_Db_Abstract_Exception
 {}

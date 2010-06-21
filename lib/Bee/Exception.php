@@ -27,49 +27,12 @@
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-/**
- * @see ASO_Exception
- */
-require_once 'ASO/Exception.php';
 
 /**
- * Session handling and data storage
- *
  * @category   Colony
  * @package    ASO
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Session
-{
-    /**
-     * Creates the session handler using the adapter passed.
-     *    
-     * @param string $adapter The name of the backend to use.
-     * @param array $config The configuration to pass to the backend adapter.
-     * @return void
-     */
-    public static function factory( $adapter, $config = array() )
-    {
-        // Verify that adapter parameters are in an array.
-        if( !is_array( $config ) )
-            throw new ASO_Session_Exception( 'Adapter parameters must be in an array' );
-
-        // Verify that an adapter name has been specified.
-        if( !is_string( $adapter ) || empty( $adapter ) )
-            throw new ASO_Session_Exception( 'Adapter name must be specified in a string' );
-            
-        
-        // Load the adapter class.
-        require_once 'ASO/Session/'.$adapter.'.php';
-
-        // Create an instance of the adapter, passing the config to it.
-        $adapterName = 'ASO_Session_' . $adapter;
-        $sessAdapter = new $adapterName( $config );
-        
-        return $sessAdapter;
-    }
-}
-
-class ASO_Session_Exception extends ASO_Exception
+class Bee_Exception extends Exception
 {}

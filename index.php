@@ -30,8 +30,8 @@
 set_include_path( "lib" . PATH_SEPARATOR . "app" . PATH_SEPARATOR . "var" . PATH_SEPARATOR . get_include_path() );
 
 require_once 'Config.php';
-require_once 'ASO/Dispatch.php';
+require_once 'Bee/Dispatch.php';
 
-$dispatcher = new ASO_Dispatch();
+$dispatcher = new Bee_Dispatch();
 //$dispatcher->throwExceptions(true);
 $dispatcher->run();

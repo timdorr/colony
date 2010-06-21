@@ -28,9 +28,9 @@
  */
 
 /**
- * @see ASO_Exception
+ * @see Bee_Exception
  */
-require_once 'ASO/Exception.php';
+require_once 'Bee/Exception.php';
 
 /**
  * Abstract SQL database adapter class.
@@ -40,7 +40,7 @@ require_once 'ASO/Exception.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-abstract class ASO_Db_Abstract
+abstract class Bee_Db_Abstract
 {
     /**
      * The configuration to connect to the database
@@ -93,7 +93,7 @@ abstract class ASO_Db_Abstract
 	{
         // Verify that configuration is in an array.
         if( !is_array( $config ) )
-            throw new ASO_Db_Exception('Configuration must be in an array');
+            throw new Bee_Db_Exception('Configuration must be in an array');
 	
 		$this->config = $config;
 	}
@@ -136,5 +136,5 @@ abstract class ASO_Db_Abstract
 	}
 }
 
-class ASO_Db_Abstract_Exception extends ASO_Exception
+class Bee_Db_Abstract_Exception extends Bee_Exception
 {}

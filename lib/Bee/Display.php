@@ -28,9 +28,9 @@
  */
 
 /**
- * @see ASO_Exception
+ * @see Bee_Exception
  */
-require_once 'ASO/Exception.php';
+require_once 'Bee/Exception.php';
 
 /**
  * Display adapter to show output from the controller through a view.
@@ -40,11 +40,11 @@ require_once 'ASO/Exception.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Display
+class Bee_Display
 {
     /**
      * Display backend
-     * @var ASO_Display
+     * @var Bee_Display
      */
     private static $dispBackend = null;
 
@@ -59,17 +59,17 @@ class ASO_Display
     {
         // Verify that backend parameters are in an array.
         if( !is_array( $config ) )
-            throw new ASO_Display_Exception( 'Backend parameters must be in an array' );
+            throw new Bee_Display_Exception( 'Backend parameters must be in an array' );
 
         // Verify that an backend name has been specified.
         if( !is_string( $backend ) || empty( $backend ) )
-            throw new ASO_Display_Exception( 'Backend name must be specified in a string' );
+            throw new Bee_Display_Exception( 'Backend name must be specified in a string' );
 
         // Load the backend class.
-        require_once 'ASO/Display/'.$backend.'.php';
+        require_once 'Bee/Display/'.$backend.'.php';
 
         // Create an instance of the backend, passing the config to it.
-        $backendName = 'ASO_Display_' . $backend;
+        $backendName = 'Bee_Display_' . $backend;
         self::$dispBackend = new $backendName( $config );
     }
 
@@ -84,19 +84,19 @@ class ASO_Display
     {
         // Verify that the display backend has been constructed by the factory.
         if( null === self::$dispBackend )
-            throw new ASO_Display_Exception( 'Backend not created by factory; please run factory first' );
+            throw new Bee_Display_Exception( 'Backend not created by factory; please run factory first' );
             
         // Verify that backend parameters are in an array.
         if( !is_array( $data ) )
-            throw new ASO_Display_Exception( 'Display data must be in an array' );
+            throw new Bee_Display_Exception( 'Display data must be in an array' );
 
         // Verify that an backend name has been specified.
         if( !is_string( $view ) || empty( $view ) )
-            throw new ASO_Display_Exception( 'View must be specified in a string' );
+            throw new Bee_Display_Exception( 'View must be specified in a string' );
 
         self::$dispBackend->runDisplay( $view, $data );
     }
 }
 
-class ASO_Display_Exception extends ASO_Exception
+class Bee_Display_Exception extends Bee_Exception
 {}

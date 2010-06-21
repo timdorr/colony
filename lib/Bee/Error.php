@@ -28,14 +28,14 @@
  */
 
 /**
- * @see ASO_Session
+ * @see Bee_Session
  */
-require_once 'ASO/Session.php';
+require_once 'Bee/Session.php';
 
 /**
- * @see ASO_Exception
+ * @see Bee_Exception
  */
-require_once 'ASO/Exception.php';
+require_once 'Bee/Exception.php';
 
 /**
  * Error handling and assignment. Takes in errors for specific identifiers and
@@ -47,7 +47,7 @@ require_once 'ASO/Exception.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Error 
+class Bee_Error 
 {
     /**
      * Errors stored by this error handler
@@ -57,7 +57,7 @@ class ASO_Error
     
     /**
      * Controller reference
-     * @var ASO_Controller 
+     * @var Bee_Controller 
      */
     protected $_controller = null;
 
@@ -71,13 +71,13 @@ class ASO_Error
         $this->_controller =& $controller;
         
         // Load errors from the session object
-        $sess =& ASO_Registry('sess');
-        if( isset( $sess['ASO_Error'] ) )
+        $sess =& Bee_Registry('sess');
+        if( isset( $sess['Bee_Error'] ) )
         {
-            self::$_errors = $sess['ASO_Error'];
+            self::$_errors = $sess['Bee_Error'];
             
             // Clear the session data for subsequent page loads
-            unset( $sess['ASO_Error'] );
+            unset( $sess['Bee_Error'] );
         }
     }
 
@@ -127,8 +127,8 @@ class ASO_Error
         if( count( self::$_errors ) > 0 )
         {
             // Store the errors into the session for the following page load and redirect
-            $sess =& ASO_Registry('sess');
-            $sess['ASO_Error'] = self::$_errors;
+            $sess =& Bee_Registry('sess');
+            $sess['Bee_Error'] = self::$_errors;
             $this->_controller->redirect( $location );
         }
     }
@@ -176,5 +176,5 @@ class ASO_Error
     }
 }
 
-class ASO_Error_Exception extends ASO_Exception
+class Bee_Error_Exception extends Bee_Exception
 {}

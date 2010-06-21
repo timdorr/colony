@@ -35,11 +35,11 @@
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Registry
+class Bee_Registry
 {
     /**
      * Singleton instance of registry
-     * @var ASO_Registry
+     * @var Bee_Registry
      */
     private static $instance;
 
@@ -76,26 +76,26 @@ class ASO_Registry
     /**
      * Gets the singleton instance of the registry
      * 
-     * @return ASO_Registry
+     * @return Bee_Registry
      */   
     public static function &getInstance() 
     {
         if( !isset( self::$instance ) )
-            self::$instance = new ASO_Registry;
+            self::$instance = new Bee_Registry;
 
         return self::$instance;
     }
 }
  
 /**
- * Public function for convienience. Wraps around ASO_Registry::getVar()
+ * Public function for convienience. Wraps around Bee_Registry::getVar()
  * 
  * @param string $key Key of the variable
  * @return mixed
  */
-function &ASO_Registry( $key )
+function &Bee_Registry( $key )
 {
-    $reg =& ASO_Registry::getInstance();
+    $reg =& Bee_Registry::getInstance();
 
     return $reg->getVar( $key );
 }

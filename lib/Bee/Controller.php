@@ -28,29 +28,29 @@
  */
 
 /**
- * @see ASO_Input
+ * @see Bee_Input
  */
-require_once 'ASO/Input.php';
+require_once 'Bee/Input.php';
 
 /**
- * @see ASO_Db
+ * @see Bee_Db
  */
-require_once 'ASO/Db.php';
+require_once 'Bee/Db.php';
 
 /**
- * @see ASO_Session
+ * @see Bee_Session
  */
-require_once 'ASO/Session.php';
+require_once 'Bee/Session.php';
 
 /**
- * @see ASO_Error
+ * @see Bee_Error
  */
-require_once 'ASO/Error.php';
+require_once 'Bee/Error.php';
 
 /**
- * @see ASO_Exception
+ * @see Bee_Exception
  */
-require_once 'ASO/Exception.php';
+require_once 'Bee/Exception.php';
 
 /**
  * Controller parent class. 
@@ -60,7 +60,7 @@ require_once 'ASO/Exception.php';
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
-class ASO_Controller
+class Bee_Controller
 {
     /**
      * Application config
@@ -69,14 +69,14 @@ class ASO_Controller
     protected $config = array();
 
     /**
-     * Processed input from ASO_Input::filter_input()
+     * Processed input from Bee_Input::filter_input()
      * @var array
      */
     protected $input = array();
     
     /**
      * Database connection
-     * @var ASO_Db_Astract
+     * @var Bee_Db_Astract
      */
     protected $db = array();
     
@@ -88,13 +88,13 @@ class ASO_Controller
     
     /**
      * Error storage
-     * @var ASO_Error
+     * @var Bee_Error
      */
     protected $error = null;
     
     /**
      * Session object
-     * @var ASO_Session_Abstract 
+     * @var Bee_Session_Abstract 
      */
     protected $_session = null;
 
@@ -122,30 +122,30 @@ class ASO_Controller
     {
         // Verify that controller config is in an array.
         if( !is_array( $config ) )
-            throw new ASO_Controller_Exception('Controller configuraion must be in an array');
+            throw new Bee_Controller_Exception('Controller configuraion must be in an array');
 
         $this->_setEnvironment();
 
         $this->baseURL = $config['baseURL'];
         $this->config = $config;
 
-        $input =& ASO_Registry('input');
-        $input = $this->input =& ASO_Input::filterInput();
+        $input =& Bee_Registry('input');
+        $input = $this->input =& Bee_Input::filterInput();
 
-        $db =& ASO_Registry('db');
-        $db = $this->db = ASO_Db::factory( $config['db_type'], $config );
+        $db =& Bee_Registry('db');
+        $db = $this->db = Bee_Db::factory( $config['db_type'], $config );
 
-        $this->_session = ASO_Session::factory( $config['session_type'],
+        $this->_session = Bee_Session::factory( $config['session_type'],
                                                 array( 'db' => &$this->db,
                                                        'session_timeout' => $config['session_timeout'],
                                                        'session_domain' => $config['session_domain'],
                                                        'session_path' => $config['session_path'] ) );
-        $sess =& ASO_Registry('sess');
+        $sess =& Bee_Registry('sess');
         $sess = $this->_session->getData();
         $this->sess =& $sess;
 
-        $error =& ASO_Registry('error');
-        $error = $this->error = new ASO_Error( $this );
+        $error =& Bee_Registry('error');
+        $error = $this->error = new Bee_Error( $this );
     }
     
     /**
@@ -196,7 +196,7 @@ class ASO_Controller
     /**
      * Default callback for logging runtime exceptions.
      * 
-     * Override this method in a subclass of ASO_Controller
+     * Override this method in a subclass of Bee_Controller
      * to log this error to someplace other than
      * var/log/exceptions.log.
      * 
@@ -232,7 +232,7 @@ EXCEPTIONLOG;
     /**
      * Default callback for emailing runtime exceptions.
      * 
-     * Override this method in a subclass of ASO_Controller
+     * Override this method in a subclass of Bee_Controller
      * to change the default behavior.
      * 
      * @param Exception $e The exception that was thrown at runtime
@@ -241,7 +241,7 @@ EXCEPTIONLOG;
     {
         if( !isset($this->config['email_exceptions_address']) )
         {
-            throw new ASO_Controller_Exception( "Exception emailing turned on but no address specified.  Please specify \$CONFIG['email_exceptions_address'] in app/Config.php" );
+            throw new Bee_Controller_Exception( "Exception emailing turned on but no address specified.  Please specify \$CONFIG['email_exceptions_address'] in app/Config.php" );
         }
         
         $to = $from = $this->config['email_exceptions_address'];
@@ -270,5 +270,5 @@ EMAILMESSAGE;
     
 }
 
-class ASO_Controller_Exception extends ASO_Exception
+class Bee_Controller_Exception extends Bee_Exception
 {}
