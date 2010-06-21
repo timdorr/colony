@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database name="colony" defaultIdMethod="native">
+    <table name="session">
+        <column name="id" type="varchar" size="40" required="true" primaryKey="true" />
+        <column name="data" type="longvarchar" />
+        <behavior name="timestampable" />
+    </table>
+</database>
+
