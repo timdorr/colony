@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
@@ -30,7 +30,7 @@
 
 /**
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */

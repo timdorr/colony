@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
@@ -36,7 +36,7 @@ require_once 'Bee/Display.php';
  * Display backend for native PHP files
  *
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */

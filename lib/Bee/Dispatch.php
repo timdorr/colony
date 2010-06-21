@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
@@ -55,7 +55,7 @@ require_once 'Bee/Display.php';
  * adapter.
  *
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
@@ -214,7 +214,7 @@ class Bee_Dispatch
             if( $this->logExceptions() )
             {
                 if(!isset( $this->controller )) {
-                    require_once('ASO/Controller.php');
+                    require_once('Bee/Controller.php');
                     call_user_func_array( array( new Bee_Controller($this->config), 'logException'), array($e) );
                 } else {
                     call_user_func_array( array( $this->controller, 'logException'), array($e) );
@@ -225,7 +225,7 @@ class Bee_Dispatch
             if( $this->emailExceptions() )
             {
                 if(!isset( $this->controller )) {
-                    require_once('ASO/Controller.php');
+                    require_once('Bee/Controller.php');
                     call_user_func_array( array( new Bee_Controller($this->config), 'emailException'), array($e) );
                 } else {
                     call_user_func_array( array( $this->controller, 'emailException'), array($e) );

@@ -22,7 +22,7 @@
  * THE SOFTWARE.
  *
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
@@ -45,7 +45,7 @@ require_once 'Smarty/Smarty.class.php';
  * Display backend for the Smarty templating engine
  *
  * @category   Colony
- * @package    ASO
+ * @package    Bee
  * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
