@@ -4,7 +4,7 @@ $CONFIG['db_type'] = 'MySQL';
 $CONFIG['db_host'] = 'localhost';
 $CONFIG['db_user'] = 'user';
 $CONFIG['db_pass'] = 'password';
-$CONFIG['db_name'] = 'asoworx';
+$CONFIG['db_name'] = 'colony';
 
 $CONFIG['session_type'] = "Db";
 $CONFIG['session_timeout'] = 3600;

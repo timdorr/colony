@@ -1,7 +1,7 @@
 <?php
 /**
- * ASOworx
- * Copyright (c) A Small Orange Software (http://www.asmallorange.com)
+ * Colony
+ * Copyright (c) Army of Bees (www.armyofbees.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @category   ASOworx
- * @package    ASOworx
- * @copyright  Copyright (c) A Small Orange Software (http://www.asmallorange.com)
+ * @category   Colony
+ * @package    Colony
+ * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 

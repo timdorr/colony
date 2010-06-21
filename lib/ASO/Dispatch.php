@@ -1,7 +1,7 @@
 <?php
 /**
- * ASOworx
- * Copyright (c) A Small Orange Software (http://www.asmallorange.com)
+ * Colony
+ * Copyright (c) Army of Bees (www.armyofbees.com)
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  *
- * @category   ASOworx
+ * @category   Colony
  * @package    ASO
- * @copyright  Copyright (c) A Small Orange Software (http://www.asmallorange.com)
+ * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
@@ -54,9 +54,9 @@ require_once 'ASO/Display.php';
  * Dispatcher to route HTTP requests into controllers and back out to a display
  * adapter.
  *
- * @category   ASOworx
+ * @category   Colony
  * @package    ASO
- * @copyright  Copyright (c) A Small Orange Software (http://www.asmallorange.com)
+ * @copyright  Copyright (c) Army of Bees (www.armyofbees.com)
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 class ASO_Dispatch
@@ -197,7 +197,7 @@ class ASO_Dispatch
     }
 
     /**
-     * Starts execution of the ASOworx framework.
+     * Starts execution of the Colony framework.
      *
      * @throws ASO_Exception
      * @return void
