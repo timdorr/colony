@@ -90,14 +90,14 @@ class Bee_Session_Db
     private function _loadSession()
     {
         // Check if we've got an existing session stored
-        $Bee_ =& Bee_Input::filterInput();
-        if ( !array_key_exists( 'session', $Bee_ ) )
+        $input =& Bee_Input::filterInput();
+        if ( !array_key_exists( 'session', $input ) )
         {
             $this->newSession();
         }
         else
         {
-            $this->_id = $Bee_['session'];
+            $this->_id = $input['session'];
 
             // Grab the session data from the database
             $result = $this->_db->get( 'session', "session_id = '{$this->_id}'" );
