@@ -53,6 +53,12 @@ require_once 'Bee/Input.php';
 class Bee_Session_Propel
 {
     /**
+     * The session ID
+     * @var string
+     */
+    private $_id = '';
+
+    /**
      * Propel object
      * @var Session
      */
@@ -104,10 +110,7 @@ class Bee_Session_Propel
             {            
                 // Make sure it hasn't timed out
                 if( strtotime( $this->_model->getUpdatedAt() ) >= time() - $this->timeout )
-                {
-                    $this->_data = unserialize( $this->_model->getData() );
-                    $this->_time = $this->_model->getUpdatedAt();
-                    
+                {   
                     setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
                 }
                 else
@@ -135,9 +138,7 @@ class Bee_Session_Propel
         // Load the ID and data
         $this->_id = sha1( uniqid( microtime() ) );
         $this->_model->setId( $this->_id );
-
-        $this->_data = array();
-        $this->_model->setData( serialize( $this->_data ) );
+        $this->_model->setData( serialize( array() ) );
 
         // Save a cookie
         setcookie( 'session', $this->_id, time() + $this->timeout, $this->path, $this->domain, FALSE, TRUE );
@@ -152,7 +153,6 @@ class Bee_Session_Propel
     public function saveSession( &$data )
     {
         // Save into the object
-        $this->_data = $data;
         $this->_model->setData( serialize( $this->_data ) );
 
         // Save the object
@@ -171,19 +171,7 @@ class Bee_Session_Propel
     {
         $this->_loadSession();
 
-        return $this->_data;
-    }
-
-    /**
-     * Gets the stored time from the session
-     *
-     * @return int
-     */    
-    public function getTime()
-    {
-        $this->_loadSession();
-
-        return $this->_time;
+        return unserialize( $this->_model->getData() );
     }
 
     /**
@@ -197,8 +185,7 @@ class Bee_Session_Propel
     	$out .= "<pre>";
     	$out .= "Session Object\n";
     	$out .= "{\n";
-    	$out .= "\t[session_id] => ".$this->_id."\n";
-    	$out .= "\t[time] => ".date( DATE_RFC822, $this->_time )."\n";
+    	$out .= "\t[id] => ".$this->_id."\n";
     	$out .= "\t[data] => ".str_replace( array( "\n", "    " ), array( "", "" ), print_r( $this->_data, true ) )."\n";
     	$out .= "}\n";
     	$out .= "</pre>";
