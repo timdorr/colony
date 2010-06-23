@@ -62,7 +62,7 @@ class Bee_Db_Propel extends Bee_Db_Abstract
 		Propel::init( 'app/model/conf/colony-conf.php' );
 		
 		// Make sure we can see the models
-		set_include_path( 'app/model/classes' . PATH_SEPARATOR . get_include_path() );
+		set_include_path( 'app/model' . PATH_SEPARATOR . get_include_path() );
 	}
 
 }
