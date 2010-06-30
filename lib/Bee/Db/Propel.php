@@ -27,6 +27,9 @@
  * @license    http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
+// Including the Propel libraries into the path
+set_include_path( 'lib/Propel/runtime/lib' . PATH_SEPARATOR . get_include_path() );
+
 /**
  * @see Bee_Db_Abstract
  */
