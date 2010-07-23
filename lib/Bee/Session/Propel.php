@@ -153,7 +153,7 @@ class Bee_Session_Propel
     public function saveSession( &$data )
     {
         // Save into the object
-        $this->_model->setData( serialize( $this->_data ) );
+        $this->_model->setData( serialize( $data ) );
 
         // Save the object
         $this->_model->save();
