@@ -324,6 +324,14 @@ class QueryBuilderTest extends BookstoreTestBase
 			$q1->addOr($cton0);
 		}
 		$this->assertEquals($q1, $q, 'filterByPrimaryKeys() translates to a series of Criteria::EQUAL in the PK columns');
+
+		$q = new BookListRelQuery();
+		$q->filterByPrimaryKeys(array());
+		
+		$q1 = BookListRelQuery::create();
+		$q1->add(null, '1<>1', Criteria::CUSTOM);
+		$this->assertEquals($q1, $q, 'filterByPrimaryKeys() translates to an always failing test on empty arrays');
+
 	}
 	
 	public function testFilterByIntegerPk()
@@ -848,6 +856,24 @@ class QueryBuilderTest extends BookstoreTestBase
 			->join('Book.Publisher', Criteria::LEFT_JOIN)
 			->add(PublisherPeer::NAME, 'Penguin', Criteria::EQUAL);
 		$this->assertTrue($q->equals($q1), 'useFkQuery() called twice on two relations creates two joins');
+	}
+	
+	public function testUseFkQueryNoAliasThenWith()
+	{
+		$con = Propel::getConnection();
+		$books = BookQuery::create()
+			->useAuthorQuery()
+				->filterByFirstName('Leo')
+			->endUse()
+			->with('Author')
+			->find($con);
+		$q1 = $con->getLastExecutedQuery();
+		$books = BookQuery::create()
+			->leftJoinWithAuthor()
+			->add(AuthorPeer::FIRST_NAME, 'Leo', Criteria::EQUAL)
+			->find($con);
+		$q2 = $con->getLastExecutedQuery();
+		$this->assertEquals($q1, $q2, 'with() can be used after a call to useFkQuery() with no alias');
 	}
 	
 	public function testPrune()

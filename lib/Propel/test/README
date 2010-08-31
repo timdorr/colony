@@ -87,6 +87,8 @@ Run all the unit tests at once using Phing:
 
 '''Tip''': The `-verbose` option will force the display of PHP notices, which are hidden by default.
 
+'''Warning''': The `testsuite/generator/builder/NamespaceTest.php` file uses PHP 5.3 namespaces, and therefore will create a parse error under PHP 5.2. To launch the unit test suite in a PHP 5.2 platform, simply delete this test file.
+
 To run a single test, specify the classname (minus 'Test' ending) on the commandline, using the `test` property. For example to run only GeneratedObjectTest:
 
 {{{

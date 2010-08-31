@@ -22,7 +22,7 @@
  * @author     Martin Poeschl <mpoeschl@marmot.at> (Torque)
  * @author     Henning P. Schmiedehausen <hps@intermeta.de> (Torque)
  * @author     Kurt Schrader <kschrader@karmalab.org> (Torque)
- * @version    $Revision: 1813 $
+ * @version    $Revision: 1913 $
  * @package    propel.runtime
  */
 class Propel
@@ -30,7 +30,7 @@ class Propel
 	/**
 	 * The Propel version.
 	 */
-	const VERSION = '1.5.3-dev';
+	const VERSION = '1.5.3';
 	
 	/**
 	 * A constant for <code>default</code>.
@@ -165,7 +165,7 @@ class Propel
 		'DBAdapter'           => 'adapter/DBAdapter.php',
 		'DBMSSQL'             => 'adapter/DBMSSQL.php',
 		'MssqlPropelPDO'      => 'adapter/MSSQL/MssqlPropelPDO.php',
-		'MssqlDebugPDO'       => 'adapter/MSSQL/MssqlDebugPDO.php',	
+		'MssqlDebugPDO'       => 'adapter/MSSQL/MssqlDebugPDO.php',
 		'MssqlDateTime'       => 'adapter/MSSQL/MssqlDateTime.class.php',
 		'DBMySQL'             => 'adapter/DBMySQL.php',
 		'DBMySQLi'            => 'adapter/DBMySQLi.php',
@@ -174,6 +174,7 @@ class Propel
 		'DBPostgres'          => 'adapter/DBPostgres.php',
 		'DBSQLite'            => 'adapter/DBSQLite.php',
 		'DBSybase'            => 'adapter/DBSybase.php',
+		'DBSQLSRV'            => 'adapter/DBSQLSRV.php',
 
 		'PropelArrayCollection' => 'collection/PropelArrayCollection.php',
 		'PropelCollection'    => 'collection/PropelCollection.php',
@@ -196,6 +197,7 @@ class Propel
 		'PropelObjectFormatter' => 'formatter/PropelObjectFormatter.php',
 		'PropelOnDemandFormatter' => 'formatter/PropelOnDemandFormatter.php',
 		'PropelStatementFormatter' => 'formatter/PropelStatementFormatter.php',
+		'PropelSimpleArrayFormatter' => 'formatter/PropelSimpleArrayFormatter.php',
 		
 		'BasicLogger'         => 'logger/BasicLogger.php',
 		'MojaviLogAdapter'    => 'logger/MojaviLogAdapter.php',

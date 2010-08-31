@@ -9,6 +9,7 @@
  */
 
 require_once 'builder/om/OMBuilder.php';
+require_once 'builder/om/ClassTools.php';
 
 /**
  * Generates the empty PHP5 stub query class for use with single table inheritance.
@@ -80,6 +81,25 @@ class QueryInheritanceBuilder extends OMBuilder
 	}
 
 	/**
+	 * Returns classpath to parent class.
+	 * @return     string
+	 */
+	protected function getParentClassName()
+	{
+		$ancestorClassName = ClassTools::classname($this->getChild()->getAncestor());
+		if ($this->getDatabase()->hasTableByPhpName($ancestorClassName)) {
+			return $this->getNewStubQueryBuilder($this->getDatabase()->getTableByPhpName($ancestorClassName))->getClassname();
+		} else {
+			// find the inheritance for the parent class
+			foreach ($this->getTable()->getChildrenColumn()->getChildren() as $child) {
+				if ($child->getClassName() == $ancestorClassName) {
+					return $this->getNewStubQueryInheritanceBuilder($child)->getClassname();
+				}
+			}
+		}
+	}
+	
+	/**
 	 * Adds the include() statements for files that this class depends on or utilizes.
 	 * @param      string &$script The script will be modified in this method.
 	 */
@@ -104,7 +124,7 @@ require '".$requiredClassFilePath."';
 
 		$baseBuilder = $this->getStubQueryBuilder();
 		$this->declareClassFromBuilder($baseBuilder);
-		$baseClassname = $baseBuilder->getClassname();
+		$baseClassname = $this->getParentClassName();
 
 		$script .= "
 /**

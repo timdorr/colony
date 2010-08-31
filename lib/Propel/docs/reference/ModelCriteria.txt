@@ -326,6 +326,66 @@ $nbUpdatedRows = AuthorQuery::create()
 // Beware that it may take a long time
 }}}
 
+=== Getting Columns Instead Of Objects ===
+
+{{{
+#!php
+<?php
+// When you only need a few columns, it is faster to skip object hydration
+// In such cases, call select() before find()
+$articles = ArticleQuery::create()
+  ->join('Category')
+  ->select(array('Id', 'Title', 'Content', 'Category.Name'))
+  ->find();
+// returns PropelArrayCollection(
+//   array('Id' => 123, 'Title' => 'foo', 'Content' => 'This is foo', 'Category.Name' => 'Miscellaneous'),
+//   array('Id' => 456, 'Title' => 'bar', 'Content' => 'This is bar', 'Category.Name' => 'Main')
+// )
+
+// When you need only one record, use select() with findOne()
+$articles = ArticleQuery::create()
+  ->join('Category')
+  ->select(array('Id', 'Title', 'Content', 'Category.Name'))
+  ->findOne();
+// returns array('Id' => 123, 'Title' => 'foo', 'Content' => 'This is foo', 'Category.Name' => 'Miscellaneous')
+
+// When you need only one column, use a column name as the select() argument
+$articles = ArticleQuery::create()
+  ->join('Category')
+  ->select('Title')
+  ->find();
+// returns array('foo', 'bar')
+
+// When you need only one column from one record, use select() and findOne()
+$articles = ArticleQuery::create()
+  ->join('Category')
+  ->select('Title')
+  ->findOne();
+// returns 'foo'
+
+// select() accepts calculated columns
+// The calculated column MUST have an alias
+$nbComments = ArticleQuery::create()
+  ->join('Comment')
+  ->withColumn('count(Comment.ID)', 'nbComments')
+  ->groupBy('Article.Title')
+  ->select(array('Article.Title', 'nbComments'))
+  ->find();
+// returns PropelArrayCollection(
+//   array('Article.Title' => 'foo', 'nbComments' => 25),
+//   array('Article.Title' => 'bar', 'nbComments' => 32)
+// )
+
+// When you want to select all the columns from the main class, use select('*')
+$articles = ArticleQuery::create()
+  ->select('*')
+  ->find();
+// returns PropelArrayCollection(
+//   array('Id' => 123, 'Title' => 'foo', 'Content' => 'This is foo'),
+//   array('Id' => 456, 'Title' => 'bar', 'Content' => 'This is bar')
+// )
+}}}
+
 === Creating An Object Based on a Query ===
 
 You may often create a new object based on values used in conditions if a query returns no result. This happens a lot when dealing with cross-reference tables in many-to-many relationships. To avoid repeating yourself, use `findOneOrCreate()` instead of `findOne()` in such cases:
@@ -649,7 +709,9 @@ $authorName = $book->getAuthorName();
 
 Propel adds the 'with' column to the SELECT clause of the query, and uses the second argument of the `withColumn()` call as a column alias. This additional column is later available as a 'virtual' column, i.e. using a getter that does not correspond to a real column. You don't actually need to write the `getAuthorName()` method ; Propel uses the magic `__call()` method of the generated `Book` class to catch the call to a virtual column.
 
-`withColumn()` is also of great use to add calculated columns:
+'''Tip''': You can call `withColumn()` multiple times to add more than one virtual column to the resulting objects.
+
+`withColumn()` is also of great use to add calculated columns, using aggregate functions and a GROUP BY statement:
 
 {{{
 #!php
@@ -666,7 +728,17 @@ foreach ($authors as $author) {
 
 With a single SQL query, you can have both a list of objects and an additional column for each object. That makes of `withColumn()` a great query saver.
 
-'''Tip''': You can call `withColumn()` multiple times to add more than one virtual column to the resulting objects.
+'''Tip''': Users of PostgreSQL will need to use the alternative method `groupByClass($class)` to force the grouping on all the columns of a given model whenever they use an aggregate function:
+
+{{{
+#!php
+<?php
+$authors = AuthorQuery::create()
+  ->join('Author.Book')
+  ->withColumn('COUNT(Book.Id)', 'NbBooks')
+  ->groupByClass('Author')
+  ->find();
+}}}
 
 === Adding A Comment ===
 
@@ -942,6 +1014,7 @@ Propel provides four formatters:
  * `PropelObjectFormatter`: The default formatter, returning a model object for `findOne()`, and a `PropelObjectCollection` of model objects for `find()`
  * `PropelOnDemandFormatter`: To save memory for large resultsets, prefer this formatter ; it hydrates rows one by one as they are iterated on, and doesn't create a new Propel Model object at each row. Note that this formatter doesn't use the Instance Pool.
  * `PropelArrayFormatter`: The array formatter, returning an associative array for `findOne()`, and a `PropelArrayCollection` of arrays for `find()`
+ * `PropelSimpleArrayFormatter`: An array formatter for `select()` queries, returning a string, an associative array for `findOne()`, or a `PropelArrayCollection` of arrays for `find()`
  * `PropelStatementFormatter`: The 'raw' formatter, returning a `PDOStatement` in any case.
 
 You can easily write your own formatter to format the resultas the way you want. A formatter is basically a subclass of `PropelFormatter` providing a `format()` and a `formatOne()` method expecting a PDO statement.

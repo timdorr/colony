@@ -15,7 +15,7 @@ require_once 'tools/helpers/bookstore/BookstoreTestBase.php';
  * Tests for ConcreteInheritanceBehavior class
  *
  * @author    François Zaniontto
- * @version   $Revision: 1774 $
+ * @version   $Revision: 1906 $
  * @package   generator.behavior.concrete_inheritance
  */
 class ConcreteInheritanceBehaviorTest extends BookstoreTestBase
@@ -169,6 +169,21 @@ class ConcreteInheritanceBehaviorTest extends BookstoreTestBase
 		$this->assertTrue($content instanceof ConcreteContent, 'getParentOrCreate() returns an instance of the parent class');
 		$this->assertFalse($content->isNew(), 'getParentOrCreate() returns an existing instance of the parent class if the object is persisted');
 		$this->assertEquals($article->getId(), $content->getId(), 'getParentOrCreate() returns the parent object related to the current object');
+	}
+	
+	public function testGetParentOrCreateExistingParent()
+	{
+		ConcreteContentQuery::create()->deleteAll();
+		ConcreteArticleQuery::create()->deleteAll();
+		$content = new ConcreteContent();
+		$content->save();
+		$id = $content->getId();
+		ConcreteContentPeer::clearInstancePool();
+		$article = new ConcreteArticle();
+		$article->setId($id);
+		$article->save();
+		$this->assertEquals($id, $article->getId(), 'getParentOrCreate() keeps manually set pk');
+		$this->assertEquals(1, ConcreteContentQuery::create()->count(), 'getParentOrCreate() creates no new parent entry');
 	}
 	
 	public function testGetSyncParent()

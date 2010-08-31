@@ -26,7 +26,7 @@ require_once 'model/AppData.php';
  * characters.</p>
  *
  * @author     <a href="mailto:dlr@collab.net">Daniel Rall</a>
- * @version    $Id: NameFactoryTest.php 1612 2010-03-16 22:56:21Z francois $
+ * @version    $Id: NameFactoryTest.php 1912 2010-08-16 19:52:39Z francois $
  * @package    generator.model
  */
 class NameFactoryTest extends BaseTestCase
@@ -117,7 +117,8 @@ class NameFactoryTest extends BaseTestCase
 	/**
 	 * @throws     Exception on fail
 	 */
-	public function testNames() {
+	public function testNames()
+	{
 		for ($algoIndex = 0; $algoIndex < count(self::$ALGORITHMS); $algoIndex++) {
 			$algo = self::$ALGORITHMS[$algoIndex];
 			$algoInputs = self::$INPUTS[$algoIndex];
@@ -125,7 +126,7 @@ class NameFactoryTest extends BaseTestCase
 				$inputs = $this->makeInputs($algo, $algoInputs[$i]);
 				$generated = NameFactory::generateName($algo, $inputs);
 				$expected = self::$OUTPUTS[$algoIndex][$i];
-				$this->assertEquals($expected, $generated, 0, "Algorithm " . $algo . " failed to generate an unique name");
+				$this->assertEquals($expected, $generated, "Algorithm " . $algo . " failed to generate an unique name");
 			}
 		}
 	}
