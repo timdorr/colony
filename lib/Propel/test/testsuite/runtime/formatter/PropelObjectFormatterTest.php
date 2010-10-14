@@ -14,7 +14,7 @@ require_once 'tools/helpers/bookstore/BookstoreEmptyTestBase.php';
  * Test class for PropelObjectFormatter.
  *
  * @author     Francois Zaninotto
- * @version    $Id: PropelObjectFormatterTest.php 1733 2010-05-04 14:25:27Z francois $
+ * @version    $Id: PropelObjectFormatterTest.php 1923 2010-08-26 16:52:54Z francois $
  * @package    runtime.formatter
  */
 class PropelObjectFormatterTest extends BookstoreEmptyTestBase
@@ -37,6 +37,16 @@ class PropelObjectFormatterTest extends BookstoreEmptyTestBase
 		} catch (PropelException $e) {
 			$this->assertTrue(true,'PropelObjectFormatter::format() trows an exception when called with no valid criteria');
 		}
+	}
+	
+	public function testFormatValidClass()
+	{
+		$stmt = $this->con->query('SELECT * FROM book');
+		$formatter = new PropelObjectFormatter();
+		$formatter->setClass('Book');
+		$books = $formatter->format($stmt);
+		$this->assertTrue($books instanceof PropelObjectCollection);
+		$this->assertEquals(4, $books->count());
 	}
 	
 	public function testFormatManyResults()

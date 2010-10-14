@@ -1,5 +1,29 @@
 = Changelog Of The Propel 1.5 Branch =
 
+== 2010-09-14: Version 1.5.4 ==
+
+ * [1954] Changed schema mappings for MSSQL that mapped to TEXT to map to VARCHAR(MAX) and mappings that mapped to IMAGE to map to VARBINARY(MAX). (KRavEN) (refs #1084)
+ * [1953] Removed unnesessary `MssqlDateTime` class as it is not needed with a properly configured FreeTDS. (KRavEN) (refs #1045)
+ * [1952] Removed unnecessary `DBMSSQL::getTimestampFormatter()` method. (KRavEN) (refs #1045)
+ * [1951] Added docs for using MSSQL Server with Propel. (KRavEN) (closes #772)
+ * [1950] Removed systematical commits from read queries. (KRavEN) (refs #1068)
+ * [1947] fixed `BasePeer` tests to account for `DBMSSQL::applyLimit()` changes (KRavEN) (#Refs #1118)
+ * [1946] added proper blob support for `pdo_sqlsrv` driver (KRavEN) (Closes #1096)
+ * [1944] added `pdo_sqlsrv` specific support to the generator (KRavEN) (Closes #1121)
+ * [1943] added new `DBAdapter::cleanupSQL()` method to allow manipulation of the query string before PDOStatement is instantiated. Fixed `pdo_dblib` FreeTDS blob inserts for MSSQL (KRavEN) (Closes #788)
+ * [1941] Fixed formatting in `Criteria` class
+ * [1940] Cleaned up obsolete adapters in DBAdapter. `Added DBMSSQL::setCharset()` method to return nothing as MSSQL does not support SET NAMES (Closes #707)
+ * [1937] Fixed warnings in the om build task
+ * [1935] Fixed behaviors would fail when using `TablePrefix` (closes #1105)
+ * [1933] Fixed a bug where `DBMSSQL::applyLimit()` was quoting identifiers that were already quoted (KRavEN) (Closes #1118)
+ * [1930] Added missing namespace declarations in generated model objects (based on a patch by marten) (closes #1100)
+ * [1928] Added missing PostgreSQL types for reverse engineering (blased on a patch by poisson) (closes #1094)
+ * [1927] Fixed `ModelCriteria::delete()` uses the wrong connection (closes #1117)
+ * [1926] Fixed `reload()` fails to reload many-to-many relationships (closes #1112)
+ * [1923] Made formatters able to deal with a statement without `Criteria` if the class is specified (closes #1107)
+ * [1918] Fix Oracle reverse Engineering problems (ddalmais) (closes #1099)
+ * [1917] Fixed side effect of on demand unit test
+ 
 == 2010-08-16: Version 1.5.3 ==
 
  * [1912] Fixed incorrect test syntax (niklas) (closes #1092)
